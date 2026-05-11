@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, MoreVertical, Calendar, CheckCircle2 } from 'lucide-react';
 import Layout from '../components/Layout';
 import { useSelector } from 'react-redux';
@@ -7,6 +8,8 @@ import type { Board } from '../types';
 
 const AssignedTasks: React.FC = () => {
   const { boards } = useSelector((state: RootState) => state.boards);
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
   
   const boardsMap = useMemo(() => {
     return boards.reduce((acc, board) => {
@@ -17,6 +20,22 @@ const AssignedTasks: React.FC = () => {
 
   const taskList = boards.flatMap(board => board.tasks);
 
+  const filteredTasks = useMemo(() => {
+    if (!searchQuery.trim()) return taskList;
+    
+    const query = searchQuery.toLowerCase();
+    return taskList.filter(task => {
+      const boardTitle = boardsMap[task.boardId]?.title || '';
+      const statusDisplay = task.status.replace("_", " ");
+      
+      return task.title.toLowerCase().includes(query) ||
+        (task.dueDate || '').toLowerCase().includes(query) ||
+        boardTitle.toLowerCase().includes(query) ||
+        statusDisplay.toLowerCase().includes(query) ||
+        task.status.toLowerCase().includes(query);
+    });
+  }, [taskList, boardsMap, searchQuery]);
+
   return (
     <Layout>
       <header className="mb-8">
@@ -25,14 +44,16 @@ const AssignedTasks: React.FC = () => {
       </header>
 
       {/* Filter/Action Row */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-        <div className="flex items-center gap-4">
-          <div className="relative">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4 w-full">
+        <div className="flex items-center gap-4 w-full">
+          <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
             <input 
-              className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-body-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none w-full md:w-64 transition-all" 
-              placeholder="Search tasks..." 
+              className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-body-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none w-full transition-all" 
+              placeholder="Search tasks with title, date, board title, or status" 
               type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
         </div>
@@ -40,7 +61,7 @@ const AssignedTasks: React.FC = () => {
 
       {/* Task List */}
       <div className="space-y-4">
-        {taskList.map((task) => {
+        {filteredTasks.map((task) => {
           const board = boardsMap[task.boardId];
           const project = board ? board.title : 'Unknown Project';
           const statusDisplay = task.status.replace("_", " ");
@@ -50,6 +71,7 @@ const AssignedTasks: React.FC = () => {
           return (
           <div 
             key={task.id}
+            onClick={() => navigate(`/boards/${task.boardId}`)}
             className="group bg-white shadow-soft-float rounded-xl p-6 border border-slate-200 hover:border-primary transition-all cursor-pointer relative overflow-hidden"
           >
             <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${
@@ -103,6 +125,12 @@ const AssignedTasks: React.FC = () => {
           </div>
           );
         })}
+        
+        {filteredTasks.length === 0 && (
+          <div className="text-center py-12 text-slate-500 bg-white rounded-xl border border-slate-200 border-dashed">
+            <p className="text-body-base">No tasks match your search criteria.</p>
+          </div>
+        )}
       </div>
     </Layout>
   );
