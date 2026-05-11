@@ -142,7 +142,7 @@ const BoardDetail: React.FC = () => {
                     <div
                       {...provided.droppableProps}
                       ref={provided.innerRef}
-                      className={`bg-slate-100/50 rounded-xl p-2 min-h-[500px] flex flex-col gap-3 transition-colors ${
+                      className={`bg-slate-100/50 rounded-xl p-2 min-h-[500px] flex flex-col gap-3 transition-colors border border-solid border-slate-200 ${
                         snapshot.isDraggingOver ? 'bg-indigo-50/50' : ''
                       }`}
                     >

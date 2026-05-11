@@ -12,19 +12,37 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose, onCr
   const [title, setTitle] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [description, setDescription] = useState('');
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState<{ title?: string; dueDate?: string }>({});
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const newErrors: { title?: string; dueDate?: string } = {};
+
     if (!title.trim()) {
-      setError('Title is required to create a task');
+      newErrors.title = 'Title is required to create a task';
+    }
+
+    if (!dueDate) {
+      newErrors.dueDate = 'Due date is required to create a task';
+    } else {
+      const selectedDate = new Date(dueDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (selectedDate < today) {
+        newErrors.dueDate = 'Due date cannot be in the past';
+      }
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
+
     onCreate({ title, dueDate, description });
     setTitle('');
     setDueDate('');
     setDescription('');
-    setError('');
+    setErrors({});
     onClose();
   };
 
@@ -44,21 +62,21 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose, onCr
             <div className="relative">
               <input
                 className={`w-full px-4 py-3 rounded-lg border-2 bg-slate-50 text-body-base placeholder:text-slate-400 outline-none transition-all ${
-                  error ? 'border-error focus:border-error' : 'border-slate-200 focus:border-primary'
+                  errors.title ? 'border-error focus:border-error' : 'border-slate-200 focus:border-primary'
                 }`}
                 id="task-title"
                 placeholder="e.g., Finalize Q4 Engineering Roadmap"
                 value={title}
                 onChange={(e) => {
                   setTitle(e.target.value);
-                  if (e.target.value) setError('');
+                  if (e.target.value) setErrors((prev) => ({ ...prev, title: undefined }));
                 }}
                 autoFocus
               />
-              {error && (
+              {errors.title && (
                 <div className="mt-2 flex items-center gap-1.5 text-error">
                   <AlertCircle className="w-4 h-4 fill-current" />
-                  <span className="text-label-sm font-bold">{error}</span>
+                  <span className="text-label-sm font-bold">{errors.title}</span>
                 </div>
               )}
             </div>
@@ -69,18 +87,29 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ isOpen, onClose, onCr
             {/* Due Date */}
             <div className="space-y-2">
               <label className="block text-label-md font-bold text-slate-700 uppercase tracking-wider" htmlFor="due-date">
-                Due Date
+                Due Date <span className="text-error">*</span>
               </label>
               <div className="relative flex items-center">
                 <Calendar className="absolute left-4 w-5 h-5 text-slate-400 pointer-events-none" />
                 <input
-                  className="w-full px-4 py-3 pl-12 rounded-lg border border-slate-200 focus:ring-2 focus:ring-primary/20 focus:border-primary bg-slate-50 text-body-base outline-none transition-all"
+                  className={`w-full px-4 py-3 pl-12 rounded-lg border bg-slate-50 text-body-base outline-none transition-all ${
+                    errors.dueDate ? 'border-error focus:ring-2 focus:ring-error/20 focus:border-error' : 'border-slate-200 focus:ring-2 focus:ring-primary/20 focus:border-primary'
+                  }`}
                   id="due-date"
                   type="date"
                   value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
+                  onChange={(e) => {
+                    setDueDate(e.target.value);
+                    if (e.target.value) setErrors((prev) => ({ ...prev, dueDate: undefined }));
+                  }}
                 />
               </div>
+              {errors.dueDate && (
+                <div className="mt-2 flex items-center gap-1.5 text-error">
+                  <AlertCircle className="w-4 h-4 fill-current" />
+                  <span className="text-label-sm font-bold">{errors.dueDate}</span>
+                </div>
+              )}
             </div>
           </div>
 
