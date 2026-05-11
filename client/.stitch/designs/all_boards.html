@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TaskFlow Pro - All Boards</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-background": "#1b1b24",
+                    "surface-dim": "#dcd8e5",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-container": "#54647a",
+                    "surface-container": "#f0ecf9",
+                    "outline-variant": "#c7c4d8",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-on-surface": "#f3effc",
+                    "surface-tint": "#4d44e3",
+                    "tertiary": "#46494b",
+                    "on-secondary": "#ffffff",
+                    "on-surface": "#1b1b24",
+                    "inverse-primary": "#c3c0ff",
+                    "tertiary-fixed-dim": "#c4c7c9",
+                    "surface": "#fcf8ff",
+                    "on-primary-container": "#dad7ff",
+                    "primary-container": "#4f46e5",
+                    "on-error": "#ffffff",
+                    "surface-variant": "#e4e1ee",
+                    "outline": "#777587",
+                    "error": "#ba1a1a",
+                    "tertiary-container": "#5e6163",
+                    "on-primary": "#ffffff",
+                    "secondary-container": "#d0e1fb",
+                    "surface-container-low": "#f5f2ff",
+                    "secondary-fixed": "#d3e4fe",
+                    "inverse-surface": "#302f39",
+                    "background": "#fcf8ff",
+                    "surface-container-high": "#eae6f4",
+                    "secondary": "#505f76",
+                    "on-secondary-fixed-variant": "#38485d",
+                    "surface-bright": "#fcf8ff",
+                    "on-tertiary-fixed": "#191c1e",
+                    "on-primary-fixed": "#0f0069",
+                    "on-surface-variant": "#464555",
+                    "primary": "#3525cd",
+                    "tertiary-fixed": "#e0e3e5",
+                    "primary-fixed": "#e2dfff",
+                    "on-secondary-fixed": "#0b1c30",
+                    "on-error-container": "#93000a",
+                    "error-container": "#ffdad6",
+                    "secondary-fixed-dim": "#b7c8e1",
+                    "on-tertiary-container": "#dadcde",
+                    "on-primary-fixed-variant": "#3323cc",
+                    "surface-container-highest": "#e4e1ee",
+                    "primary-fixed-dim": "#c3c0ff",
+                    "on-tertiary-fixed-variant": "#444749"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "card-padding": "1rem",
+                    "gutter": "1.5rem",
+                    "stack-gap": "0.75rem",
+                    "margin-page": "2rem",
+                    "column-width": "320px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "body-base": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "label-md": ["Inter"]
+            },
+            "fontSize": {
+                    "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                    "body-base": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9; /* Slate-100 per Level 0 (Background) guidance */
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .soft-float {
+            box-shadow: 0px 1px 3px rgba(0,0,0,0.05), 0px 4px 6px rgba(0,0,0,0.02);
+        }
+    </style>
+</head>
+<body class="text-on-surface bg-slate-100">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-gutter h-16 bg-surface-container-lowest dark:bg-surface-dim shadow-sm">
+<div class="flex items-center gap-8">
+<h1 class="text-headline-md font-headline-md text-primary dark:text-inverse-primary font-extrabold tracking-tight">TaskFlow Pro</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-surface-container-high dark:hover:bg-surface-container transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 rounded-full hover:bg-surface-container-high dark:hover:bg-surface-container transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="settings">settings</span>
+</button>
+<div class="h-8 w-8 rounded-full overflow-hidden border border-outline-variant bg-surface-container">
+<img alt="User profile" data-alt="A professional headshot of a business executive with a clean-cut appearance. The individual is wearing a modern charcoal blazer against a soft-focus studio background. The lighting is high-key and professional, matching a clean light-mode interface with a corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0KNdlHFqP15PLH7qANU2oZchKQHPkF7GDiS6IW861pNHu__xED-U3-ZfjTGYJzC_UkD9Xz_dfJBz8M0UqVaFr-NaPvQKmhxaVw_G-FDmDUGpm4D5sw7aJbqqTqqK99NSEKBzgLxehhiQbebYTbehNQHHPIs1FADtBwojjk7_XcVGot6zeYTPsssV9Wz2rqZsmHzNwDm_eCZrQHh6vLcv7HZwuIV6PTTNa5fQ7et3aXOeX_LqLd9w0taVl1bBJpzBOZwPPjjo40g"/>
+</div>
+</div>
+</header>
+<div class="flex pt-16 min-h-screen">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 flex flex-col p-4 border-r border-outline-variant bg-surface-container-low dark:bg-surface-container z-40 hidden md:flex">
+<div class="flex items-center gap-3 mb-8 px-2">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">architecture</span>
+</div>
+<div>
+<h2 class="font-label-md text-label-md text-primary font-bold">Workspace</h2>
+<p class="text-xs text-on-surface-variant">Engineering Team</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- All Boards (Active) -->
+<a class="flex items-center gap-3 px-3 py-2 text-primary dark:text-inverse-primary font-bold bg-secondary-container dark:bg-secondary-fixed-dim rounded-lg transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">All Boards</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-highest dark:hover:bg-inverse-surface rounded-lg transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md">Assigned to Me</span>
+</a>
+</nav>
+<button class="mt-6 flex items-center justify-center gap-2 w-full py-2.5 bg-primary text-on-primary rounded-lg font-label-md text-label-md shadow-sm hover:opacity-90 transition-all active:scale-95">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                Create New Board
+            </button>
+<div class="mt-auto space-y-1 border-t border-outline-variant pt-4">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-highest dark:hover:bg-inverse-surface rounded-lg transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-label-md text-label-md">Help</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-surface-variant hover:bg-surface-container-highest dark:hover:bg-inverse-surface rounded-lg transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-64 p-margin-page">
+<div class="max-w-7xl mx-auto">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+<div>
+<h2 class="text-headline-lg font-headline-lg text-on-background">All Boards</h2>
+<p class="text-body-base text-on-surface-variant">Manage and monitor your team's active workstreams.</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex bg-surface-container rounded-lg p-1 border border-outline-variant">
+<button class="p-1.5 bg-white shadow-sm rounded-md text-primary">
+<span class="material-symbols-outlined block">grid_view</span>
+</button>
+<button class="p-1.5 text-on-surface-variant">
+<span class="material-symbols-outlined block">format_list_bulleted</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Boards Grid (Asymmetric / Modern Bento Layout) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Board Card 1 -->
+<div class="bg-white rounded-xl soft-float border border-slate-200 p-6 hover:border-primary transition-all group flex flex-col h-full">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">rocket_launch</span>
+</div>
+<span class="bg-emerald-50 text-emerald-700 text-label-sm font-label-sm px-2 py-1 rounded-full border border-emerald-100 uppercase tracking-wider">Active</span>
+</div>
+<h3 class="text-headline-md font-headline-md text-on-surface mb-2 group-hover:text-primary transition-colors">Q4 Product Roadmap</h3>
+<p class="text-body-sm text-on-surface-variant mb-6 line-clamp-2">Strategic planning for the final quarter including mobile app v2.0 release and cloud migration.</p>
+<div class="mt-auto">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">task_alt</span>
+<span class="text-label-md font-label-md text-on-surface-variant">24 Tasks</span>
+</div>
+<div class="flex -space-x-2">
+<img alt="Team member" class="w-7 h-7 rounded-full border-2 border-white" data-alt="A portrait of a cheerful woman working in a creative studio environment. The soft, natural light emphasizes a productive and collaborative workspace vibe. The color palette is composed of soft pastels and clean whites, aligning with a modern corporate design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJw-3Xt3nafc5shqgWY1xXh2TAUiSvJR25MT8zg4JhOel_NiOw0ck4yx72HF41bfn1MDlLps7lvfqa7lfqemfpHoO1qcsGxkLlSWtsdr9y9q795P7IPcWzhhRofhHvdqdMnyCFD_OoMfIpnAFn_GwTNotmCs9pmIpSS0mvn0N0fQpQ7AvvvFqopAqUOsSTr67R5kB_lTLe5o6HDKDOM9lrMPLG4AdbcCdcWAWdC8i0tmrbbx3_BjTgP_5A179RF_060uSX3J-kkQ"/>
+<img alt="Team member" class="w-7 h-7 rounded-full border-2 border-white" data-alt="A portrait of a professional man in a focused, high-energy technology office. The lighting is crisp and cool-toned, reflecting a sophisticated and high-performance brand identity. The background is slightly blurred with hints of modern office architecture." src="https://lh3.googleusercontent.com/aida-public/AB6AXuArNjerqnuUf7CQ2kgh9YJaXAn6CBasYpCrBGwQvndWxIvORFk6jrSvkNeZ8r6lHFhbrz6F3_gdOpx1wwLacHoe9_jCd6QZZYgkzJ3cOZVZWEzp3HPYM9D3qFyB_XBfyZF4L1hQkChjG8kkTx4fK4Q_blwe4BAJ5BS_d7gf1dbsjfq9YZhC8WnXDQn2LaSUDNHlVjnuY4g5lDxkHFLTJ7CtyVy1Y6JH9BuXH8v-iY7gP2sdM87-EhiOYS0IJEc4BGS7RaTLYWQ1EA"/>
+<div class="w-7 h-7 rounded-full bg-surface-container-high border-2 border-white flex items-center justify-center text-[10px] font-bold">+4</div>
+</div>
+</div>
+<div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+<div class="bg-emerald-500 h-full w-[65%]"></div>
+</div>
+</div>
+</div>
+<!-- Board Card 2 -->
+<div class="bg-white rounded-xl soft-float border border-slate-200 p-6 hover:border-primary transition-all group flex flex-col h-full">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">design_services</span>
+</div>
+<span class="bg-orange-50 text-orange-700 text-label-sm font-label-sm px-2 py-1 rounded-full border border-orange-100 uppercase tracking-wider">In Progress</span>
+</div>
+<h3 class="text-headline-md font-headline-md text-on-surface mb-2 group-hover:text-primary transition-colors">Design System Overhaul</h3>
+<p class="text-body-sm text-on-surface-variant mb-6 line-clamp-2">Migrating the legacy component library to Tailwind CSS and implementing a new token system.</p>
+<div class="mt-auto">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">task_alt</span>
+<span class="text-label-md font-label-md text-on-surface-variant">12 Tasks</span>
+</div>
+<div class="flex -space-x-2">
+<img alt="Team member" class="w-7 h-7 rounded-full border-2 border-white" data-alt="A portrait of a confident female engineer in a bright, modern office space. The image conveys expertise and reliability, using a neutral color palette of greys, whites, and subtle blues to match a professional enterprise UI." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjSQz22KLRf6rLNFxGY0D3E4BHdu_N4S22cKmZn4tU7gLskUD-CSYSJpzBK00OOnyAnxfjw49jGppjR4qm0RfatOcTyUlBzR2nlX_nqi4RZdttgMKV2tLZZsVXV_dJuaDs1R1lmrL1prmghZ_5haPgKi-71Rj0IQuFj5g-CAZYtP2VUPtmrcUknNY-wlpW5GKeRrVVYmBZyTPc5mC9dKuR_iHKPjI2LWIDwYPuUazLdIkldrakwoRwsoOZIa6WQ9iw3X66dgE6OQ"/>
+<div class="w-7 h-7 rounded-full bg-surface-container-high border-2 border-white flex items-center justify-center text-[10px] font-bold">+2</div>
+</div>
+</div>
+<div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+<div class="bg-emerald-500 h-full w-[30%]"></div>
+</div>
+</div>
+</div>
+<!-- Board Card 3 -->
+<div class="bg-white rounded-xl soft-float border border-slate-200 p-6 hover:border-primary transition-all group flex flex-col h-full">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">payments</span>
+</div>
+<span class="bg-slate-50 text-slate-700 text-label-sm font-label-sm px-2 py-1 rounded-full border border-slate-200 uppercase tracking-wider">Planning</span>
+</div>
+<h3 class="text-headline-md font-headline-md text-on-surface mb-2 group-hover:text-primary transition-colors">Billing Infrastructure</h3>
+<p class="text-body-sm text-on-surface-variant mb-6 line-clamp-2">Integration of new Stripe payment flows and automated tax calculation for global customers.</p>
+<div class="mt-auto">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">task_alt</span>
+<span class="text-label-md font-label-md text-on-surface-variant">42 Tasks</span>
+</div>
+<div class="flex -space-x-2">
+<img alt="Team member" class="w-7 h-7 rounded-full border-2 border-white" data-alt="A portrait of a male professional looking thoughtfully into the distance, situated in a minimalist workspace. The lighting is clean and balanced, providing a serene yet authoritative atmosphere consistent with a premium productivity tool." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCn9_FPR0C07QkraCuYDg40BQp09kuOccRQc7qop6Y_5J7yE6Bolp_V65y0GcjSRdr-y7DCq6CMuvqpgeKgTLrKQ_EmZtNJ9L8JwLbEqWTaogr79PtYuO_OETCzjMY1Vz75A-sI05P20YCPX1NOS4dcLuHhI7NX2AzgisTCtYHkudOlKf9-UzFIbHgMf2JX8uSXnI-itqFeQNJG-Mjgx9Bq3dZtZcYMMJT_jqYgvkCuSC2Y8CbmlindAZe7TT8JLnbyXHjBXPjc8w"/>
+<img alt="Team member" class="w-7 h-7 rounded-full border-2 border-white" data-alt="A portrait of a creative professional woman in a modern architectural office. The setting is bright and spacious, with a color scheme of deep blues and whites that emphasizes a focused, calm workspace for high-level tasks." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYbYD0ob0-Aad7tBV2jvsEyzdj5dQNXgf3XQr2QmcXdKiBSh5DQ2GLhlv0WYDNnqdEDfSHqHJDZNO2pIW1DeublEAIL05CEdxFBvSG2zmI5fWPDD0YjGYa-hMwTAsqmXxA3q3z6HvAIn18Cg3_jBm_6DvZF58QMDDE2BbvGX9gvQWOOH5Jh5dKv9hm8kDq5kkCNy_VoxsXgTlKh-bMaJg9ID1jkY6BMYxD9mQC2O4s2CmBWzCPBz00yaRN5IAjn3mYXHs_jtQJNg"/>
+<img alt="Team member" class="w-7 h-7 rounded-full border-2 border-white" data-alt="A professional portrait of a woman in a high-tech environment. The lighting is precise, highlighting her determined expression. The background features blurred digital elements, evoking a sense of technological advancement and precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6tI3QQ5G8KGduYhf6qvFIxfEMCBGObM_NLovgnaPMW7q2iz4tPv-mUgPXYhIF2ZDGh61nsNxJg3NGa6ICIeXLsrG3NYiYuVlZWRgCe7UznGip6WL0ki_gSzVU_fJoxSD0S9Ne-gcbPhRYVgsImUZD6yivMZCskQ4d1OWIe2HRht0FMggRfa6kg4uJYNog96rMe9sQQYgNRBg_iF635t9vrqHDoDi49k9wc-NCI1o8sV9W4dghPuH-gAtqw4OdOuQ3XqPsWoJBFg"/>
+</div>
+</div>
+<div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+<div class="bg-emerald-500 h-full w-[88%]"></div>
+</div>
+</div>
+</div>
+<!-- Board Card 4 -->
+<div class="bg-white rounded-xl soft-float border border-slate-200 p-6 hover:border-primary transition-all group flex flex-col h-full">
+<div class="flex justify-between items-start mb-4">
+<div class="w-12 h-12 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">campaign</span>
+</div>
+<span class="bg-emerald-50 text-emerald-700 text-label-sm font-label-sm px-2 py-1 rounded-full border border-emerald-100 uppercase tracking-wider">Active</span>
+</div>
+<h3 class="text-headline-md font-headline-md text-on-surface mb-2 group-hover:text-primary transition-colors">Marketing Campaigns</h3>
+<p class="text-body-sm text-on-surface-variant mb-6 line-clamp-2">Coordination across social, email, and paid channels for the upcoming holiday season sale.</p>
+<div class="mt-auto">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">task_alt</span>
+<span class="text-label-md font-label-md text-on-surface-variant">15 Tasks</span>
+</div>
+<div class="flex -space-x-2">
+<img alt="Team member" class="w-7 h-7 rounded-full border-2 border-white" data-alt="A portrait of a male marketing strategist in a vibrant, airy studio. The image is filled with natural light, creating an inviting and dynamic atmosphere. The design matches a modern, clean light-mode UI with professional polish." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBpW9GG8ZLjHokyhZ2NYg-2IrFvs3iicsYG4MNyzk0tRwYH0Csz4qKbO9K98MHaEbzkAVJ0qaWBNnOnNqHtRTVQwzsaJoSw9khmY4nNzatfawHNP2RP2QgQOCFaLeaaU5lVWCMeD3t0fF_ayfJmoBMp6NpFY5AlXLsLtu4VqSPpLW0zTXEBBLgKQzl2-Auok36xhXQdar0o8raX-cLnEiThAeN-C71C1r2_cKYIG29mSpu0a5DD9mPDKnWDgI_bwtY9NsswahdUg"/>
+<div class="w-7 h-7 rounded-full bg-surface-container-high border-2 border-white flex items-center justify-center text-[10px] font-bold">+1</div>
+</div>
+</div>
+<div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
+<div class="bg-emerald-500 h-full w-[15%]"></div>
+</div>
+</div>
+</div>
+<!-- Create New Board CTA Card -->
+<button class="bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl p-6 flex flex-col items-center justify-center gap-4 text-slate-500 hover:border-primary hover:text-primary hover:bg-indigo-50 transition-all active:scale-[0.98]">
+<div class="w-14 h-14 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[32px]">add</span>
+</div>
+<div class="text-center">
+<p class="font-bold text-lg">Create New Board</p>
+<p class="text-xs">Start a fresh project workspace</p>
+</div>
+</button>
+</div>
+<!-- Recent Activity Section (Bento Style Sidebar/Section) -->
+</div>
+</main>
+</div>
+<!-- Mobile Bottom Navigation -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-outline-variant flex justify-around py-3 px-2 z-50">
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-[10px] font-bold">Boards</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="assignment_ind">assignment_ind</span>
+<span class="text-[10px]">My Tasks</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="text-[10px]">Team</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-[10px]">Settings</span>
+</a>
+</nav>
+<!-- Contextual FAB for Mobile -->
+<button class="md:hidden fixed bottom-20 right-6 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center z-50 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[28px]">add</span>
+</button>
+</body></html>

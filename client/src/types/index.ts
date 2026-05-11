@@ -1,0 +1,44 @@
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface Task {
+  id: string;
+  title: string;
+  description?: string;
+  dueDate: string;
+  status: 'TODO' | 'IN_PROGRESS' | 'DONE';
+  assigneeId?: string;
+  boardId: string;
+  columnId: string;
+}
+
+export interface Column {
+  id: string;
+  title: string;
+  taskIds: string[];
+}
+
+export interface Board {
+  id: string;
+  title: string;
+  columns: { [key: string]: Column };
+  columnOrder: string[];
+}
+
+export interface AuthState {
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  loading: boolean;
+  error: string | null;
+}
+
+export interface BoardState {
+  boards: Board[];
+  currentBoard: Board | null;
+  loading: boolean;
+  error: string | null;
+}

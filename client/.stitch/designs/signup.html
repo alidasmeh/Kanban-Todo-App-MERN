@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sign Up | Kinetic Board</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "on-surface": "#1b1b24",
+                        "primary": "#3525cd",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "on-secondary-container": "#54647a",
+                        "secondary": "#505f76",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-container": "#d0e1fb",
+                        "surface-tint": "#4d44e3",
+                        "surface-container-low": "#f5f2ff",
+                        "inverse-surface": "#302f39",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "background": "#fcf8ff",
+                        "tertiary-container": "#5e6163",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "primary-container": "#4f46e5",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-container": "#dadcde",
+                        "on-secondary-fixed": "#0b1c30",
+                        "on-error": "#ffffff",
+                        "on-surface-variant": "#464555",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#e0e3e5",
+                        "surface-bright": "#fcf8ff",
+                        "on-tertiary-fixed": "#191c1e",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "outline-variant": "#c7c4d8",
+                        "on-secondary": "#ffffff",
+                        "surface-dim": "#dcd8e5",
+                        "surface-container": "#f0ecf9",
+                        "secondary-fixed": "#d3e4fe",
+                        "tertiary": "#46494b",
+                        "surface-container-highest": "#e4e1ee",
+                        "on-primary-container": "#dad7ff",
+                        "surface-variant": "#e4e1ee",
+                        "inverse-primary": "#c3c0ff",
+                        "error": "#ba1a1a",
+                        "on-background": "#1b1b24",
+                        "outline": "#777587",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#e2dfff",
+                        "inverse-on-surface": "#f3effc",
+                        "surface-container-high": "#eae6f4",
+                        "surface": "#fcf8ff",
+                        "on-primary-fixed": "#0f0069"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "column-width": "320px",
+                        "gutter": "1.5rem",
+                        "margin-page": "2rem",
+                        "card-padding": "1rem",
+                        "stack-gap": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-base": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                        "headline-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-base": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .soft-float {
+            box-shadow: 0px 1px 3px rgba(0,0,0,0.05), 0px 4px 6px rgba(0,0,0,0.02);
+        }
+    </style>
+</head>
+<body class="bg-background font-body-base text-on-background min-h-screen flex items-center justify-center p-6">
+<main class="w-full max-w-[440px]">
+<!-- Brand Identity -->
+<div class="flex flex-col items-center mb-10">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center soft-float">
+<span class="material-symbols-outlined text-white text-2xl" data-icon="bolt" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<span class="font-headline-md text-headline-md text-on-surface tracking-tight">Kinetic Board</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-2">Create your account</h1>
+<p class="text-on-surface-variant font-body-sm text-body-sm text-center">Join the workspace for high-performance product teams.</p>
+</div>
+<!-- Signup Card -->
+<div class="bg-surface-container-lowest soft-float rounded-lg p-10 border border-outline-variant/30">
+<form action="#" class="space-y-6" method="POST">
+<!-- Full Name Field -->
+<div class="space-y-2">
+<label class="block font-label-md text-label-md text-on-surface-variant uppercase tracking-widest" for="name">Full Name</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-[20px]" data-icon="person">person</span>
+<input class="w-full bg-surface-container border border-outline-variant rounded-lg py-3.5 pl-12 pr-4 font-body-base text-body-base focus:ring-2 focus:ring-primary focus:border-primary transition-all placeholder:text-outline" id="name" name="name" placeholder="John Doe" required="" type="text"/>
+</div>
+</div>
+<!-- Email Address Field -->
+<div class="space-y-2">
+<label class="block font-label-md text-label-md text-on-surface-variant uppercase tracking-widest" for="email">Email Address</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-[20px]" data-icon="mail">mail</span>
+<input class="w-full bg-surface-container border border-outline-variant rounded-lg py-3.5 pl-12 pr-4 font-body-base text-body-base focus:ring-2 focus:ring-primary focus:border-primary transition-all placeholder:text-outline" id="email" name="email" placeholder="name@company.com" required="" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-2">
+<label class="block font-label-md text-label-md text-on-surface-variant uppercase tracking-widest" for="password">Password</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-[20px]" data-icon="lock">lock</span>
+<input class="w-full bg-surface-container border border-outline-variant rounded-lg py-3.5 pl-12 pr-12 font-body-base text-body-base focus:ring-2 focus:ring-primary focus:border-primary transition-all placeholder:text-outline" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility">visibility</span>
+</button>
+</div>
+</div>
+<!-- Confirm Password Field -->
+<div class="space-y-2">
+<label class="block font-label-md text-label-md text-on-surface-variant uppercase tracking-widest" for="confirm-password">Confirm Password</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-[20px]" data-icon="lock_reset">lock_reset</span>
+<input class="w-full bg-surface-container border border-outline-variant rounded-lg py-3.5 pl-12 pr-4 font-body-base text-body-base focus:ring-2 focus:ring-primary focus:border-primary transition-all placeholder:text-outline" id="confirm-password" name="confirm-password" placeholder="••••••••" required="" type="password"/>
+</div>
+</div>
+<!-- Submit Button -->
+<button class="w-full bg-primary-container text-white font-label-md text-body-base py-4 rounded-lg soft-float hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2" type="submit">
+<span>Create Account</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</form>
+<div class="mt-8 pt-8 border-t border-outline-variant/50 flex flex-col gap-4">
+<button class="w-full flex items-center justify-center gap-3 py-3 border border-outline-variant rounded-lg font-body-sm text-body-sm text-on-surface hover:bg-surface-container transition-colors">
+<img alt="Google Logo" class="w-4 h-4" data-alt="The iconic Google G logo in its original brand colors of blue, red, yellow, and green, rendered in a clean and flat minimalist style for a professional UI integration. The lighting is even and bright, conveying a sense of modern accessibility and trusted digital authentication within a high-end enterprise software application context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzpG2p-Ho3XYbZcRrv5g8E3SaXUmVLBl93otwZBBiOZrUfv_N69l0D7SDKP64y8gWxh58orUNnGN0RcX_iNFTzio3BeD6w-2sJUKmAfnPbYgehw5MhGxOeZZTJ4SBNCekb_rHQdqJEMYejulnaHe6F6OH8TZPQeTElxrQNpIDx2a-MtyVGC4Ku5GUEfjm3d9PtoMouW8yQ8e8ur7X-CWJtuGlUDKeaJG9eZU9CbVLh_KHZtFWgtOJdHfoOOiiCHkufjogcKhDGRw"/>
+                    Continue with Google
+                </button>
+</div>
+</div>
+<!-- Footer Link -->
+<div class="mt-8 text-center">
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                Already have an account? 
+                <a class="text-primary font-bold hover:underline underline-offset-4 ml-1" href="#">Sign in</a>
+</p>
+</div>
+<!-- Decorative elements to match Corporate/Modern aesthetic -->
+<div class="fixed top-0 left-0 w-full h-full -z-10 overflow-hidden pointer-events-none">
+<div class="absolute -top-[10%] -left-[5%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full"></div>
+<div class="absolute -bottom-[10%] -right-[5%] w-[30%] h-[30%] bg-secondary/5 blur-[100px] rounded-full"></div>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>TaskFlow Pro | Kanban Board</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed": "#d3e4fe",
+                        "tertiary-fixed": "#e0e3e5",
+                        "secondary-container": "#d0e1fb",
+                        "surface-dim": "#dcd8e5",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "tertiary": "#46494b",
+                        "on-primary-fixed": "#0f0069",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "secondary": "#505f76",
+                        "surface-container-high": "#eae6f4",
+                        "surface-container-highest": "#e4e1ee",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#302f39",
+                        "outline-variant": "#c7c4d8",
+                        "on-secondary-fixed": "#0b1c30",
+                        "on-background": "#1b1b24",
+                        "on-primary-container": "#dad7ff",
+                        "surface-container": "#f0ecf9",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "inverse-primary": "#c3c0ff",
+                        "surface-bright": "#fcf8ff",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "on-surface": "#1b1b24",
+                        "surface-container-low": "#f5f2ff",
+                        "surface-variant": "#e4e1ee",
+                        "outline": "#777587",
+                        "error": "#ba1a1a",
+                        "on-secondary-container": "#54647a",
+                        "inverse-on-surface": "#f3effc",
+                        "on-tertiary-fixed": "#191c1e",
+                        "primary-container": "#4f46e5",
+                        "tertiary-container": "#5e6163",
+                        "primary": "#3525cd",
+                        "surface": "#fcf8ff",
+                        "primary-fixed": "#e2dfff",
+                        "on-error-container": "#93000a",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-container": "#dadcde",
+                        "background": "#fcf8ff",
+                        "error-container": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "surface-tint": "#4d44e3",
+                        "on-surface-variant": "#464555",
+                        "on-tertiary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "1.5rem",
+                        "card-padding": "1rem",
+                        "stack-gap": "0.75rem",
+                        "column-width": "320px",
+                        "margin-page": "2rem"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-base": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                        "body-base": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .kanban-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(0,0,0,0.1) transparent;
+        }
+        .kanban-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+        .kanban-scroll::-webkit-scrollbar-thumb {
+            background-color: rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        .soft-float-shadow {
+            box-shadow: 0px 1px 3px rgba(0,0,0,0.05), 0px 4px 6px rgba(0,0,0,0.02);
+        }
+        .active-drag-shadow {
+            box-shadow: 0px 10px 20px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body-base text-on-surface">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-gutter h-16 bg-surface-container-lowest dark:bg-surface-dim shadow-sm">
+<div class="flex items-center gap-8">
+<span class="text-headline-md font-headline-md text-primary dark:text-inverse-primary font-bold">TaskFlow Pro</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<img alt="User profile" class="w-8 h-8 rounded-full border border-outline-variant" data-alt="A professional headshot of a smiling executive in a modern, bright office setting. The lighting is soft and natural, emphasizing a clean and high-end aesthetic. The background is slightly blurred, showing hints of glass partitions and minimalist furniture, maintaining the corporate and reliable brand identity of TaskFlow Pro." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAs2141xBS3dbHyKRncepKu82GndAeKDxHvRuYpk7cQmo5T0BHBQveu2R37BRtqgA4pFIwoVrMsAu1UUyWTFG4s6VJSVAhNWe122g9BAe9m9X6_C4SNIqhEkp1CWNpavbS9rro4vpw_ZkxpLmHPx0uziWCWArrm_2rltUXlj0kty6LEBv2gtrbQ2bzrNLvmzPfZRIFx3zB0ziPkw6--BzqDM4CTIOLZpvbauSXfU08wXOtdQLhgdsGnIxtH6Jjm8I2Xl5lkhaQJaw"/>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 flex flex-col p-4 border-r border-outline-variant bg-surface-container-low dark:bg-surface-container hidden lg:flex">
+<div class="flex items-center gap-3 mb-8 px-2">
+<div class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined">corporate_fare</span>
+</div>
+<div>
+<h2 class="text-label-md font-label-md text-on-surface font-bold">Workspace</h2>
+<p class="text-label-sm font-label-sm text-on-surface-variant">Engineering Team</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-primary dark:text-inverse-primary font-bold bg-secondary-container dark:bg-secondary-fixed-dim rounded-lg transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-label-md font-label-md">All Boards</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-surface-variant font-label-md text-label-md hover:bg-surface-container-highest dark:hover:bg-inverse-surface rounded-lg transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-label-md font-label-md">Assigned to Me</span>
+</a>
+</nav>
+<button class="mt-6 mx-2 py-2 px-4 bg-primary text-white rounded-lg font-label-md text-label-md hover:opacity-90 transition-all active:scale-95 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span>
+            Create New Board
+        </button>
+<div class="mt-auto border-t border-outline-variant pt-4 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-surface-variant font-label-md text-label-md hover:bg-surface-container-highest rounded-lg" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="text-label-md font-label-md">Help</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant dark:text-surface-variant font-label-md text-label-md hover:bg-surface-container-highest rounded-lg" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="text-label-md font-label-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="lg:ml-64 mt-16 p-margin-page bg-surface min-h-[calc(100vh-4rem)]">
+<!-- Board Header -->
+<header class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+<div>
+<nav class="flex items-center gap-2 text-label-sm font-label-sm text-on-surface-variant mb-1">
+<span>Boards</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-semibold">Q4 Infrastructure Roadmap</span>
+</nav>
+<h1 class="text-headline-lg font-headline-lg text-on-surface">Main Kanban Board</h1>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex -space-x-2 mr-4">
+<img alt="Member" class="w-8 h-8 rounded-full border-2 border-surface" data-alt="Close-up portrait of a professional woman with a friendly expression. The lighting is crisp and clear, set against a neutral corporate background that fits the TaskFlow Pro design system's aesthetic of disciplined and reliable work environments." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzZpNC5w9ht2iPU4C778qrGvmxeyy6N4_-HYDH4EOX9X7kC9uNqv79q_Str79Vi5B9Z7mWJNgRKENfHOydfzDVwaIwRWdBTvCuB3UQZLECkMxviH0Wo02Uml3_TVrWdcGM26l62OffxBOW4azcgaj11hrgqUxYw49I7sUbB017PI_O2w3jcAyvg7X3roWR_dAo66X6ciJ8OX2Eru6oYKlLwmcRNhQC81cVr4c-SrV-YEMSlwtnhzLVqlDsyIRqg-XVtU6zLOLD9Q"/>
+<img alt="Member" class="w-8 h-8 rounded-full border-2 border-surface" data-alt="A detailed headshot of a focused male professional in a modern office. The color palette is composed of soft greys and deep blues, reflecting the architectural and professional theme of the productivity platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjgptZ49FZucYQ24o8_YjlojVghbBghFjR9afHZLP6bJynoeJi09XO9hBoJkZtKcBwPxAHJJMy1wX2OO0ry2whASQscisKZZurpQEgch07uZuCAW_LS7bIz4prUM-DpeCdHYGYTBb5Edgsc39-_MGTTsLkIfNvbRROKwOqnZwtdHP8tZ2rlvz-k-Z1EecXi75HI3p3ai0D9cQGng1nyQAQd5obPiTAF0ToipxYrrB737YfYX-Dxni00BB_1u9UMrleV0H7vOlCSw"/>
+<img alt="Member" class="w-8 h-8 rounded-full border-2 border-surface" data-alt="A portrait of a male team member with a warm smile, set in a bright, minimalist workspace with glass walls and professional decor. The image mood is serene and technologically advanced." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJP141sQpzEEsuI8Um7if6S-hKRjHNHpuAFKX7DLfJzb-uGZEPZ-_kItikMm2dcorE1-bdKJBb_bAd4a7QCW5U7aXPTRxQz0aMvNncI4t9AC4Xcv662JvDZLaxb9-sYQhhwxXy5m1UUkJRTRW_uE6_MKzw4CnT6GgQPOfab4Y95sOYAVrDtqSO-6nDg0s3ps4VYv_5VT4HyWCHyH2AmvTh4_j48Bq4IqJ_e3Om4wyekvqNBx_i4VWTR0eZHGoXCEjdGLikhmU4xg"/>
+<div class="w-8 h-8 rounded-full border-2 border-surface bg-surface-container-highest flex items-center justify-center text-label-sm font-label-sm text-on-surface-variant">+8</div>
+</div>
+<button class="flex items-center gap-2 px-4 py-2 border border-outline text-on-surface-variant rounded-lg font-label-md text-label-md hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                    Filter
+                </button>
+<button class="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg font-label-md text-label-md hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                    New Task
+                </button>
+</div>
+</header>
+<!-- Kanban Board Container -->
+<div class="flex gap-gutter overflow-x-auto pb-6 kanban-scroll items-start">
+<!-- Column: To Do -->
+<div class="min-w-column-width w-column-width flex flex-col gap-stack-gap">
+<div class="flex items-center justify-between px-2 mb-2 sticky top-0 bg-surface py-2 z-10">
+<div class="flex items-center gap-2">
+<h3 class="text-label-md font-label-md text-on-surface-variant">TO DO</h3>
+<span class="bg-surface-container-highest text-on-surface-variant px-2 py-0.5 rounded-full text-label-sm font-label-sm">3</span>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_horiz</span>
+</button>
+</div>
+<div class="bg-slate-100 rounded-xl p-2 min-h-[500px] flex flex-col gap-3">
+<!-- Task Card -->
+<article class="bg-surface-container-lowest p-card-padding rounded-lg soft-float-shadow border-t-4 border-primary group cursor-grab active:cursor-grabbing">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-secondary-fixed text-on-secondary-fixed-variant px-2 py-0.5 rounded text-label-sm font-label-sm">High Priority</span>
+<button class="opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[18px] text-outline">edit</span>
+</button>
+</div>
+<h4 class="text-body-base font-bold text-on-surface mb-2">Update API Documentation</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-4 line-clamp-2">Ensure all v2 endpoints are documented with request/response examples for the mobile team.</p>
+<div class="w-full bg-surface-container rounded-full h-1.5 mb-4">
+<div class="bg-emerald-500 h-1.5 rounded-full" style="width: 65%;"></div>
+</div>
+<div class="flex items-center justify-between mt-auto">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+<span class="text-label-sm font-label-sm">Oct 12</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">chat_bubble</span>
+<span class="text-label-sm font-label-sm">5</span>
+</div>
+<img class="w-6 h-6 rounded-full" data-alt="A small, clear circular avatar of a professional man with dark hair, used as a UI element in a task card metadata section." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZfg-us-PF68DlNynI6v6U4vMtV-2U881jMt1aZEJtdlHsQoxMANTQnZnTlamjTPK0pwxB1z5OH7rQ-u8alFYV8omwrDAo7aCJx03ft0vPUT327ynGHpJMEdcpiVEK4cQcqockq8ey8r4Dc7uuVV_HSIUp7b42GRJNiXL3JK6P9chr-n22bFl4A1ILF7pVtrUGrhSSl7fG7-xUZY_NCJbGLrJgEfUh81ykXzcAD5qfVHOX5KNAj71OpxqoGs5WoD0VZtNvP6ejiw"/>
+</div>
+</div>
+</article>
+<!-- Task Card -->
+<article class="bg-surface-container-lowest p-card-padding rounded-lg soft-float-shadow border-t-4 border-secondary-fixed group cursor-grab">
+<h4 class="text-body-base font-bold text-on-surface mb-2">Refactor Database Schema</h4>
+<div class="flex items-center justify-between mt-4">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+<span class="text-label-sm font-label-sm">Oct 15</span>
+</div>
+<img class="w-6 h-6 rounded-full" data-alt="A small, clear circular avatar of a professional woman, used as a UI element in a task card metadata section." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZKGODwsh9EsAe33PJRw7w_IdFQA7_cGR2c5OrQBg9dEpjS9qGlt4VIjPtlexc4GeIjDlFE6G7rilUH6XKzTJa7abAmPCAfEfI9NeRwvjk-DnsXlttmjdeIqmcPiLvD8Ufca_vwzsCAHnK1r1CrUUr7crxvQW8GfOccIPICc01vSgPkZxmDmBvaNKFbQs9yLo9H94dJDFETUq-x8l1L-rHLHONCZ4bEr3kWdKp8snsQOxv8mWFX70AJyO_n5u4CNAV8XeZAVkOfA"/>
+</div>
+</article>
+<button class="w-full flex items-center justify-center gap-2 p-3 border-2 border-dashed border-outline-variant rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-md text-label-md group">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                        Add Task
+                    </button>
+</div>
+</div>
+<!-- Column: In Progress -->
+<div class="min-w-column-width w-column-width flex flex-col gap-stack-gap">
+<div class="flex items-center justify-between px-2 mb-2 sticky top-0 bg-surface py-2 z-10">
+<div class="flex items-center gap-2">
+<h3 class="text-label-md font-label-md text-on-surface-variant">IN PROGRESS</h3>
+<span class="bg-surface-container-highest text-on-surface-variant px-2 py-0.5 rounded-full text-label-sm font-label-sm">2</span>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_horiz</span>
+</button>
+</div>
+<div class="bg-slate-100 rounded-xl p-2 min-h-[500px] flex flex-col gap-3">
+<!-- FLOATING STATE: Drag and Drop Feedback -->
+<article class="bg-surface-container-lowest p-card-padding rounded-lg active-drag-shadow border-t-4 border-primary transform -rotate-2 scale-105 z-20 cursor-grabbing ring-2 ring-primary">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-error-container text-on-error-container px-2 py-0.5 rounded text-label-sm font-label-sm">Critical</span>
+</div>
+<h4 class="text-body-base font-bold text-on-surface mb-2">Fix Auth Regression</h4>
+<p class="text-body-sm font-body-sm text-on-surface-variant mb-4">Users reporting 401 errors on the login page after the last deploy.</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px] text-error">warning</span>
+<span class="text-label-sm font-label-sm font-bold text-error">Today</span>
+</div>
+<img class="w-6 h-6 rounded-full" data-alt="A small, clear circular avatar of a professional man, used as a UI element in a task card metadata section." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC03e-4DH2cNDnhvnxFJXFe7vY6OgE-eMGK565EO_MpUxmuO3I5e3E-8ZJu1yEbPcJgUWBg7BOAWZHQROUrvUUlNHs-2gWIsDnjythibEZC8lk7nLKae77biPiliCffVIBbVr4MXJz1qbEHkQDroN3s7MCpRVmOu93N04rHQWlVXG8RLUEnM__c3ga-n6yjCcnyR61HE6Bz5pKePTl5UAkBu8NknWO1Y2EtRL52XySYVCfy_emlF37TMCPgmLRBb9VBAsuYExsoog"/>
+</div>
+</article>
+<article class="bg-surface-container-lowest p-card-padding rounded-lg soft-float-shadow border-t-4 border-on-secondary-container group cursor-grab">
+<h4 class="text-body-base font-bold text-on-surface mb-2">UI Component Library Audit</h4>
+<div class="flex items-center justify-between mt-4">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+<span class="text-label-sm font-label-sm">Oct 20</span>
+</div>
+<img class="w-6 h-6 rounded-full" data-alt="Small circular avatar of a team member for the kanban card interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBN1pytm0IN9IcD6GitWN4ldcNMMp7IyB5lMuFDKjkoAwKOjDG45jZSgMJQ_vSIIbB922YWGmsKPy3p3rNrZOxeFFIb6E6Xo7_IcCvANF1YMXBaX5yWRX9x_PlGSYspCDlNYUAWoUjQFCqzRHzIu8iG4H3KWh4L4mFVd6R6xvogTyN2OxZ42oPvZqUSt6fRCWJyOnCKa2ZbtjqdmAh0FK8DO8qKs5ZO9udeydVN-Y7dcAG8nXkGAYc-ttaENrs3hjObZjLhEg1JOA"/>
+</div>
+</article>
+<button class="w-full flex items-center justify-center gap-2 p-3 border-none text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-md text-label-md group">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                        Add Task
+                    </button>
+</div>
+</div>
+<!-- Column: Done -->
+<div class="min-w-column-width w-column-width flex flex-col gap-stack-gap">
+<div class="flex items-center justify-between px-2 mb-2 sticky top-0 bg-surface py-2 z-10">
+<div class="flex items-center gap-2">
+<h3 class="text-label-md font-label-md text-on-surface-variant">DONE</h3>
+<span class="bg-surface-container-highest text-on-surface-variant px-2 py-0.5 rounded-full text-label-sm font-label-sm">4</span>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[18px]">more_horiz</span>
+</button>
+</div>
+<div class="bg-slate-100 rounded-xl p-2 min-h-[500px] flex flex-col gap-3 relative">
+<!-- DROP ZONE FEEDBACK -->
+<div class="absolute inset-2 border-2 border-dashed border-primary bg-primary/5 rounded-xl flex items-center justify-center z-0 pointer-events-none">
+<span class="text-primary font-label-md text-label-md">Drop here to complete</span>
+</div>
+<article class="bg-surface-container-lowest/70 p-card-padding rounded-lg soft-float-shadow border-t-4 border-outline-variant group grayscale opacity-80 z-10">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-on-tertiary-container text-tertiary-fixed-dim px-2 py-0.5 rounded text-label-sm font-label-sm">Finished</span>
+<span class="material-symbols-outlined text-emerald-500 text-[20px]">check_circle</span>
+</div>
+<h4 class="text-body-base font-bold text-on-surface mb-2 line-through">Security Patch v4.2.1</h4>
+<div class="flex items-center justify-between mt-4">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+<span class="text-label-sm font-label-sm">Oct 05</span>
+</div>
+<img class="w-6 h-6 rounded-full" data-alt="Small circular avatar of a team member for the kanban card interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7fNppwYmw_xxHzbKgqA4Ja3xogLlpzhIlQpTRcBnwAe5MdIjZsKyUF-uYlsk3u4UYC5LFB8uEpchqsn_Gdw2EVNyV7-d-lomgK8aoStQrz7b5RiygSGuCZpIaL9M4ZnlY5Bw5c_kr0O3k_JT8Jt8xzPchEqRB_YGdprgks-DsjWflio0pCjlBOxamYiOCac4LsVqr5Mtd-9x6tPoEap4oerJqCvUEcN4ugHo47Q44uNIlHJ4gPBOPyGlFhaMAn_qKzESR8GF-Lg"/>
+</div>
+</article>
+<article class="bg-surface-container-lowest/70 p-card-padding rounded-lg soft-float-shadow border-t-4 border-outline-variant group grayscale opacity-80 z-10">
+<h4 class="text-body-base font-bold text-on-surface mb-2 line-through">Onboarding Flow Redesign</h4>
+<div class="flex items-center justify-between mt-4">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+<span class="text-label-sm font-label-sm">Sep 28</span>
+</div>
+<img class="w-6 h-6 rounded-full" data-alt="Small circular avatar of a team member for the kanban card interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA41_O02DhsqiGnIWbG2duD1DOUlxg2Iwtj0bjTOq6OGyjk9laL2BJtmopAvv6_mMOyIDTjJh_13CVtly8yDXdkIeK0vwY-dC297c4NS2ttvXM4z5fSN_s_EXBp6vh7DbxIwFLBqQ71oplTntXtz1hp7_GC4iizCb9k05qWjWrAJScODHxCSTKwRciA3hwefLww9S9qn94VCYV9sLs51M8fP7Y1sjuc3da179unrIsbp6ohcgJHWRz-93hRcObkWu8_exoPxC3Umw"/>
+</div>
+</article>
+<button class="w-full flex items-center justify-center gap-2 p-3 border-none text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-md text-label-md group z-10">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                        Add Task
+                    </button>
+</div>
+</div>
+<!-- Add Column Button -->
+<div class="min-w-[200px]">
+<button class="w-full flex items-center justify-center gap-2 p-3 bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-all font-label-md text-label-md border-2 border-transparent hover:border-outline-variant mt-12">
+<span class="material-symbols-outlined">add_column_right</span>
+                    Add Section
+                </button>
+</div>
+</div>
+</main>
+</body></html>

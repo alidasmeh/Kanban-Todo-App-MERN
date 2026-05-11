@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#dadcde",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "on-tertiary-fixed-variant": "#444749",
+                        "surface-container-highest": "#e4e1ee",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "tertiary-fixed": "#e0e3e5",
+                        "primary-fixed": "#e2dfff",
+                        "on-secondary-fixed": "#0b1c30",
+                        "on-error-container": "#93000a",
+                        "surface-bright": "#fcf8ff",
+                        "on-tertiary-fixed": "#191c1e",
+                        "on-primary-fixed": "#0f0069",
+                        "primary": "#3525cd",
+                        "on-surface-variant": "#464555",
+                        "surface-container-high": "#eae6f4",
+                        "secondary": "#505f76",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "background": "#fcf8ff",
+                        "surface-container-low": "#f5f2ff",
+                        "secondary-fixed": "#d3e4fe",
+                        "inverse-surface": "#302f39",
+                        "secondary-container": "#d0e1fb",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "tertiary-container": "#5e6163",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#e4e1ee",
+                        "outline": "#777587",
+                        "primary-container": "#4f46e5",
+                        "on-primary-container": "#dad7ff",
+                        "inverse-primary": "#c3c0ff",
+                        "tertiary-fixed-dim": "#c4c7c9",
+                        "surface": "#fcf8ff",
+                        "tertiary": "#46494b",
+                        "on-secondary": "#ffffff",
+                        "surface-tint": "#4d44e3",
+                        "on-surface": "#1b1b24",
+                        "surface-container": "#f0ecf9",
+                        "outline-variant": "#c7c4d8",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#f3effc",
+                        "surface-dim": "#dcd8e5",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#1b1b24",
+                        "on-secondary-container": "#54647a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-page": "2rem",
+                        "column-width": "320px",
+                        "stack-gap": "0.75rem",
+                        "gutter": "1.5rem",
+                        "card-padding": "1rem"
+                    },
+                    "fontFamily": {
+                        "body-base": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-base": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "500"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- TopNavBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-gutter h-16 bg-surface-container-lowest dark:bg-surface-dim shadow-sm">
+<div class="flex items-center gap-4">
+<span class="text-headline-md font-headline-md font-bold text-primary dark:text-inverse-primary">TaskFlow Pro</span>
+</div>
+<div class="flex items-center gap-3">
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-full active:scale-95 duration-200">notifications</button>
+<button class="material-symbols-outlined p-2 text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-full active:scale-95 duration-200">settings</button>
+<div class="h-8 w-8 rounded-full bg-secondary-container flex items-center justify-center overflow-hidden ml-2 border border-outline-variant">
+<img alt="User profile" class="h-full w-full object-cover" data-alt="A professional headshot of a workspace manager in a bright, modern corporate environment. The lighting is clean and high-key, emphasizing a light-mode aesthetic. The individual looks confident and reliable, aligning with a high-performance productivity software brand. The background is softly blurred with hints of a minimalist architectural office." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRNQCCrb5GxWFCGq9fRxMKdPXlFayWbrecHQ8gUBoWko3GgNZHYK9TzZeLXNlmoex4QZbE5HoL5yzSUBIZiwXGVddp7admmzZ7nDoSqWPkP1D79_YLhZ4RRagbickeH3QQyiEmO_NVD_wd_6f4T6w64BAHG1cxm18nUdAsWNiSb81soFM2WaaiWV372XHJFOLWf41DIdVt5_pI29rm9JZ7E0c64qFgwkEQ8byccW7kzXQcQmxT76ZT8eT98-vzs2asqszHODfEww"/>
+</div>
+</div>
+</header>
+<!-- Sidebar Integration (Customized per request) -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 flex flex-col p-4 border-r border-outline-variant bg-surface-container-low dark:bg-surface-container transition-all duration-200 ease-in-out">
+<div class="mb-8">
+<div class="flex items-center gap-3 px-2 mb-1">
+<div class="w-8 h-8 rounded bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary text-[18px]">business</span>
+</div>
+<div>
+<h2 class="font-headline-md text-label-md font-bold text-primary">Workspace</h2>
+<p class="text-[10px] text-on-surface-variant">Engineering Team</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-primary dark:text-inverse-primary font-bold bg-secondary-container dark:bg-secondary-fixed-dim rounded-lg transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md">All Boards</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">Assigned to Me</span>
+</a>
+</nav>
+<div class="pt-4 border-t border-outline-variant space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-md text-label-md">Help</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-highest transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-md text-label-md">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="pl-64 pt-16 min-h-screen flex items-center justify-center bg-slate-100">
+<div class="max-w-2xl w-full px-8 py-12">
+<!-- Create Board Card -->
+<section class="bg-surface-container-lowest rounded-xl shadow-[0px_1px_3px_rgba(0,0,0,0.05),0px_4px_6px_rgba(0,0,0,0.02)] border border-outline-variant overflow-hidden">
+<div class="p-8">
+<div class="flex items-center gap-4 mb-8">
+<div class="p-3 bg-primary-container rounded-lg">
+<span class="material-symbols-outlined text-on-primary">add_box</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Create New Board</h1>
+</div>
+<form class="space-y-8">
+<!-- Board Title Input -->
+<div class="space-y-2">
+<label class="font-label-md text-label-md text-on-surface-variant" for="board-title">Board Title</label>
+<input class="w-full px-4 py-3 bg-surface-container rounded-lg border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-base text-body-base text-on-surface" id="board-title" placeholder="e.g., Q4 Product Roadmap" type="text"/>
+</div>
+<!-- Add Members Section -->
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md text-on-surface-variant">Add Members</label>
+<span class="text-[11px] font-medium text-secondary bg-secondary-container px-2 py-0.5 rounded-full">3 Selected</span>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-12 pr-4 py-3 bg-surface-container rounded-lg border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all font-body-base text-body-base text-on-surface" placeholder="Search by name or invite by email..." type="email"/>
+</div>
+<!-- Selected Members Chips -->
+<div class="flex flex-wrap gap-2">
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-full border border-outline-variant">
+<div class="w-5 h-5 rounded-full overflow-hidden">
+<img alt="Avatar" data-alt="Close-up portrait of a female professional with a warm smile. She is in a brightly lit, modern minimalist office setting. The style is clean, corporate, and optimistic, matching a light-themed productivity dashboard. High-quality digital photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmIAh9JylfQ3x0Z-mUa7StfZHbYHHyFRdaz_12MgijoJQUQH3SSoul_66IMasN6tSyqGrkG8AF9O4Ds0bylr95l_xkQKvTt_DpfaCsQaTKeb3wQiRPJrp3gMDY5EuWNIbrNqkQTB-2SHVaWplUgDmtCPIFbkQkyrK89ROTIqBIbRpxgksKMkz_Ud82hB2AdUABfuHalkSR5CwaeiL9t-Ewj7YXPk2F4buH4BYAqcVr2CU_xNQIlvGmNDdXQHc3s6C90VN9XwulHQ"/>
+</div>
+<span class="text-body-sm font-medium text-on-surface">Sarah Chen</span>
+<button class="material-symbols-outlined text-[16px] text-outline hover:text-error">close</button>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-full border border-outline-variant">
+<div class="w-5 h-5 rounded-full overflow-hidden">
+<img alt="Avatar" data-alt="Portrait of a male tech professional in a bright, contemporary studio. He wears a neutral-toned shirt, and the background is a soft, off-white architectural space. The aesthetic is modern, disciplined, and light-mode compliant." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAg9PZwoTZvS3V4YOIMaUzBx4tq8TZnpoZZfNCgFhTRZXw3BbytUAUlpU4rqmWHRGRCe5oGOfURbsOFWZe-w2NkBBzLQnEmHVVKw7LUMcXbyIfuMxUsxqQIyIgpGQPnxF7Aq8HQ0QnmR80xqUARGuJvzqD-3RXM-UJUHB6M449RvXP6H2B1Ofll1nDDj0w3JZPaOEuwIj8dt0rqjBjV2ji0vsyZcK_cRe_ERRdTph2l0NhOVHSSmP-yxZlAu-gPa5FDgGNSf36QuA"/>
+</div>
+<span class="text-body-sm font-medium text-on-surface">Marcus T.</span>
+<button class="material-symbols-outlined text-[16px] text-outline hover:text-error">close</button>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-full border border-outline-variant">
+<div class="w-5 h-5 rounded-full bg-tertiary-fixed flex items-center justify-center">
+<span class="text-[10px] font-bold text-on-tertiary-fixed">JS</span>
+</div>
+<span class="text-body-sm font-medium text-on-surface">Jordan Smith</span>
+<button class="material-symbols-outlined text-[16px] text-outline hover:text-error">close</button>
+</div>
+</div>
+</div>
+<!-- Visibility Setting (Extra UX polish) -->
+</form>
+</div>
+<!-- Footer Actions -->
+<div class="px-8 py-6 bg-surface-container-low border-t border-outline-variant flex items-center justify-end gap-4">
+<button class="px-6 py-2.5 font-label-md text-label-md text-secondary hover:bg-surface-container-highest rounded-lg transition-all active:scale-95">
+                        Cancel
+                    </button>
+<button class="px-8 py-2.5 font-label-md text-label-md bg-primary text-on-primary rounded-lg shadow-sm hover:shadow-md transition-all active:scale-95">
+                        Create Board
+                    </button>
+</div>
+</section>
+<!-- Secondary Info (Asymmetric Layout element) -->
+<div class="mt-12 grid grid-cols-3 gap-8 opacity-70">
+<div class="space-y-2">
+<span class="material-symbols-outlined text-primary">auto_awesome</span>
+<h3 class="font-label-md text-label-md text-on-surface">Templates</h3>
+<p class="text-body-sm text-on-surface-variant">Quickly start with pre-built workflows for engineering or design.</p>
+</div>
+<div class="space-y-2">
+<span class="material-symbols-outlined text-primary">sync</span>
+<h3 class="font-label-md text-label-md text-on-surface">Auto-Sync</h3>
+<p class="text-body-sm text-on-surface-variant">Integrated with Slack and Jira to keep your team in the loop.</p>
+</div>
+<div class="space-y-2">
+<span class="material-symbols-outlined text-primary">security</span>
+<h3 class="font-label-md text-label-md text-on-surface">Permissions</h3>
+<p class="text-body-sm text-on-surface-variant">Granular access controls for every board member you invite.</p>
+</div>
+</div>
+</div>
+</main>
+</body></html>
