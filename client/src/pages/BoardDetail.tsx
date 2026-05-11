@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { 
   DragDropContext, 
   Droppable, 
@@ -16,12 +17,18 @@ import {
 } from 'lucide-react';
 import Layout from '../components/Layout';
 import CreateTaskModal from '../components/CreateTaskModal';
-import { useBoardContext } from '../context/BoardContext';
+import type { AppDispatch, RootState } from '../store';
+import { 
+  createTask as createTaskAction, 
+  deleteTask as deleteTaskAction, 
+  moveTask as moveTaskAction 
+} from '../features/boardSlice';
 
 const BoardDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { boards, createTask, deleteTask, moveTask } = useBoardContext();
-  const board = id ? boards[id] : undefined;
+  const dispatch = useDispatch<AppDispatch>();
+  const { boards } = useSelector((state: RootState) => state.boards);
+  const board = boards.find((b: any) => b.id === id);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
   const [openMenuTaskId, setOpenMenuTaskId] = useState<string | null>(null);
@@ -45,12 +52,11 @@ const BoardDetail: React.FC = () => {
 
   const handleCreateTask = (taskData: { title: string; dueDate: string; description: string }) => {
     const columnId = activeColumnId || 'todo';
-    
-    createTask(id || '1', columnId, taskData);
+    dispatch(createTaskAction({ boardId: id || '1', columnId, ...taskData }));
   };
 
   const handleDeleteTask = (taskId: string, columnId: string) => {
-    deleteTask(id || '1', columnId, taskId);
+    dispatch(deleteTaskAction({ taskId, boardId: id || '1', columnId }));
     setOpenMenuTaskId(null);
   };
 
@@ -66,7 +72,14 @@ const BoardDetail: React.FC = () => {
       return;
     }
 
-    moveTask(id || '1', source.droppableId, destination.droppableId, source.index, destination.index, draggableId);
+    dispatch(moveTaskAction({
+      boardId: id || '1',
+      sourceColId: source.droppableId,
+      destColId: destination.droppableId,
+      sourceIndex: source.index,
+      destIndex: destination.index,
+      taskId: draggableId
+    }));
   };
 
   if (!board) {

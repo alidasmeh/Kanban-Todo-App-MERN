@@ -4,11 +4,11 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import Layout from '../components/Layout';
-import { useBoardContext } from '../context/BoardContext';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../store';
 
 const Boards: React.FC = () => {
-  const { boards } = useBoardContext();
-  const boardsList = Object.values(boards);
+  const { boards } = useSelector((state: RootState) => state.boards);
 
   return (
     <Layout>
@@ -22,7 +22,7 @@ const Boards: React.FC = () => {
 
       {/* Boards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {boardsList.map((board) => {
+        {boards.map((board) => {
           const taskCount = Object.values(board.columns).reduce((acc, col) => acc + col.taskIds.length, 0);
           const doneCount = board.columns['done']?.taskIds.length || 0;
           const progress = taskCount === 0 ? 0 : Math.round((doneCount / taskCount) * 100);

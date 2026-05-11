@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Mail, Lock, Eye, EyeOff, User, ArrowRight, Zap } from 'lucide-react';
-import { loginStart, loginSuccess } from '../features/authSlice';
-import type { RootState } from '../store';
+import { signup, clearError } from '../features/authSlice';
+import type { RootState, AppDispatch } from '../store';
 
 const Signup: React.FC = () => {
   const [name, setName] = useState('');
@@ -12,27 +12,27 @@ const Signup: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { loading } = useSelector((state: RootState) => state.auth);
+  const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/boards');
+    }
+    return () => {
+      dispatch(clearError());
+    };
+  }, [isAuthenticated, navigate, dispatch]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       alert("Passwords don't match");
       return;
     }
     
-    dispatch(loginStart());
-    
-    // Mock signup logic
-    setTimeout(() => {
-      dispatch(loginSuccess({
-        user: { id: '1', name, email },
-        token: 'mock-token'
-      }));
-      navigate('/boards');
-    }, 1000);
+    dispatch(signup({ name, email, password }));
   };
 
   return (
@@ -57,6 +57,11 @@ const Signup: React.FC = () => {
         {/* Signup Card */}
         <div className="bg-white shadow-soft-float rounded-xl p-10 border border-slate-200/50">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <div className="bg-red-50 text-red-600 p-3 rounded-lg text-body-sm border border-red-100">
+                {error}
+              </div>
+            )}
             {/* Full Name Field */}
             <div className="space-y-2">
               <label className="block text-label-md text-slate-500 uppercase tracking-widest" htmlFor="name">

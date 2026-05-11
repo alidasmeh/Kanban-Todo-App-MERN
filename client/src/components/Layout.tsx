@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { 
-  Bell, 
   Settings, 
   LayoutDashboard, 
   UserCheck, 
   Plus, 
-  HelpCircle, 
   LogOut,
   Rocket
 } from 'lucide-react';
 import { logout } from '../features/authSlice';
+import { createBoard, fetchBoards } from '../features/boardSlice';
 import CreateBoardModal from './CreateBoardModal';
+import type { RootState, AppDispatch } from '../store';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -22,7 +22,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchBoards());
+    }
+  }, [dispatch, isAuthenticated]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -30,8 +37,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   const handleCreateBoard = (title: string) => {
-    console.log('Creating board:', title);
-    // Future: dispatch(createBoard(title));
+    dispatch(createBoard({ title }));
   };
 
   const navItems = [

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Modal from './Modal';
-import { Rocket, Calendar, AlertCircle, Lightbulb } from 'lucide-react';
+import { Rocket, Calendar, AlertCircle } from 'lucide-react';
 
 interface CreateTaskModalProps {
   isOpen: boolean;

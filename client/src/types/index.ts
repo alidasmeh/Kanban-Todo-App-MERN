@@ -24,8 +24,12 @@ export interface Column {
 export interface Board {
   id: string;
   title: string;
+  description?: string;
+  category?: string;
+  color?: string;
   columns: { [key: string]: Column };
   columnOrder: string[];
+  tasks: Task[];
 }
 
 export interface AuthState {

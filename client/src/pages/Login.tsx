@@ -1,35 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Mail, Lock, Eye, EyeOff, Rocket, ArrowRight } from 'lucide-react';
-import { loginStart, loginSuccess, loginFailure } from '../features/authSlice';
-import type { RootState } from '../store';
+import { login, clearError } from '../features/authSlice';
+import type { RootState, AppDispatch } from '../store';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { loading, error } = useSelector((state: RootState) => state.auth);
+  const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.auth);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/boards');
+    }
+    return () => {
+      dispatch(clearError());
+    };
+  }, [isAuthenticated, navigate, dispatch]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(loginStart());
-    
-    // Mock login logic
-    setTimeout(() => {
-      if (email === 'demo@example.com' && password === 'password') {
-        dispatch(loginSuccess({
-          user: { id: '1', name: 'Demo User', email: 'demo@example.com' },
-          token: 'mock-token'
-        }));
-        navigate('/boards');
-      } else {
-        dispatch(loginFailure('Invalid email or password. Use demo@example.com / password'));
-      }
-    }, 1000);
+    dispatch(login({ email, password }));
   };
 
   return (

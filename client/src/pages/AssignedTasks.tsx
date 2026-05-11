@@ -1,12 +1,20 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Search, MoreVertical, Calendar, CheckCircle2 } from 'lucide-react';
 import Layout from '../components/Layout';
-
-import { useBoardContext } from '../context/BoardContext';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../store';
 
 const AssignedTasks: React.FC = () => {
-  const { boards } = useBoardContext();
-  const taskList = Object.values(boards).flatMap(board => board.tasks);
+  const { boards } = useSelector((state: RootState) => state.boards);
+  
+  const boardsMap = useMemo(() => {
+    return boards.reduce((acc, board) => {
+      acc[board.id] = board;
+      return acc;
+    }, {} as Record<string, any>);
+  }, [boards]);
+
+  const taskList = boards.flatMap(board => board.tasks);
 
   return (
     <Layout>
@@ -32,7 +40,7 @@ const AssignedTasks: React.FC = () => {
       {/* Task List */}
       <div className="space-y-4">
         {taskList.map((task) => {
-          const board = boards[task.boardId];
+          const board = boardsMap[task.boardId];
           const project = board ? board.title : 'Unknown Project';
           const statusDisplay = task.status.replace("_", " ");
           const isDone = task.status === 'DONE';
