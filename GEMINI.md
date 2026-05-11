@@ -10,6 +10,7 @@
 ## Mandatory Constraints
 * **No `any` Types:** Strict TypeScript usage is required; do not use `any`.
 * **State Management:** Abstract all server interactions (fetching, creating, updating) through Redux. Avoid direct API calls in components.
+* **Notifications:** Every server-side action (create, update, delete, etc.) must trigger a toast notification (success/error) to inform the user about the action's status.
 * **Design Source:** All UI code must strictly follow the specifications generated in `DESIGN.md`.
 
 

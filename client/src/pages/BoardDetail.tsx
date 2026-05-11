@@ -18,6 +18,7 @@ import {
 import Layout from '../components/Layout';
 import CreateTaskModal from '../components/CreateTaskModal';
 import type { AppDispatch, RootState } from '../store';
+import type { Board } from '../types';
 import { 
   createTask as createTaskAction, 
   deleteTask as deleteTaskAction, 
@@ -28,7 +29,7 @@ const BoardDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
   const { boards } = useSelector((state: RootState) => state.boards);
-  const board = boards.find((b: any) => b.id === id);
+  const board = boards.find((b: Board) => b.id === id);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
   const [openMenuTaskId, setOpenMenuTaskId] = useState<string | null>(null);
@@ -213,12 +214,6 @@ const BoardDetail: React.FC = () => {
                                 <p className="text-body-sm text-slate-500 mb-4 line-clamp-2">
                                   {task.description}
                                 </p>
-                              )}
-                              
-                              {task.columnId === 'todo' && (
-                                <div className="w-full bg-slate-100 rounded-full h-1.5 mb-4">
-                                  <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: '65%' }}></div>
-                                </div>
                               )}
 
                               <div className="flex items-center justify-between mt-auto">

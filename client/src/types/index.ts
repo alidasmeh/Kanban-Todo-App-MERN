@@ -46,3 +46,15 @@ export interface BoardState {
   loading: boolean;
   error: string | null;
 }
+
+export type NotificationType = 'success' | 'error' | 'info' | 'warning';
+
+export interface Notification {
+  id: string;
+  message: string;
+  type: NotificationType;
+}
+
+export interface NotificationState {
+  notifications: Notification[];
+}

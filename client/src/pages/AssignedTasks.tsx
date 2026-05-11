@@ -3,6 +3,7 @@ import { Search, MoreVertical, Calendar, CheckCircle2 } from 'lucide-react';
 import Layout from '../components/Layout';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../store';
+import type { Board } from '../types';
 
 const AssignedTasks: React.FC = () => {
   const { boards } = useSelector((state: RootState) => state.boards);
@@ -11,7 +12,7 @@ const AssignedTasks: React.FC = () => {
     return boards.reduce((acc, board) => {
       acc[board.id] = board;
       return acc;
-    }, {} as Record<string, any>);
+    }, {} as Record<string, Board>);
   }, [boards]);
 
   const taskList = boards.flatMap(board => board.tasks);

@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 import type { BoardState, Board, Task } from '../types';
 import api from '../utils/api';
+import { showNotification } from './notificationSlice';
 
 interface TaskPayload {
   boardId: string;
@@ -38,51 +39,66 @@ export const fetchBoards = createAsyncThunk(
     try {
       const response = await api.get<Board[]>('/boards');
       return response.data;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to fetch boards');
+    } catch (err) {
+      const axiosError = err as { response?: { data?: { message?: string } } };
+      return rejectWithValue(axiosError.response?.data?.message || 'Failed to fetch boards');
     }
   }
 );
 
 export const createBoard = createAsyncThunk(
   'boards/createBoard',
-  async (boardData: Partial<Board>, { rejectWithValue }) => {
+  async (boardData: Partial<Board>, { dispatch, rejectWithValue }) => {
     try {
       const response = await api.post<Board & { _id: string }>('/boards', boardData);
-      return { ...response.data, id: response.data._id, tasks: [] } as Board;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to create board');
+      const newBoard = { ...response.data, id: response.data._id, tasks: [] } as Board;
+      dispatch(showNotification({ message: 'Board created successfully!', type: 'success' }));
+      return newBoard;
+    } catch (err) {
+      const axiosError = err as { response?: { data?: { message?: string } } };
+      const message = axiosError.response?.data?.message || 'Failed to create board';
+      dispatch(showNotification({ message, type: 'error' }));
+      return rejectWithValue(message);
     }
   }
 );
 
 export const createTask = createAsyncThunk(
   'boards/createTask',
-  async (taskData: TaskPayload, { rejectWithValue }) => {
+  async (taskData: TaskPayload, { dispatch, rejectWithValue }) => {
     try {
       const response = await api.post<Task & { _id: string }>('/tasks', taskData);
-      return { ...response.data, id: response.data._id } as Task;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to create task');
+      const newTask = { ...response.data, id: response.data._id } as Task;
+      dispatch(showNotification({ message: 'Task created successfully!', type: 'success' }));
+      return newTask;
+    } catch (err) {
+      const axiosError = err as { response?: { data?: { message?: string } } };
+      const message = axiosError.response?.data?.message || 'Failed to create task';
+      dispatch(showNotification({ message, type: 'error' }));
+      return rejectWithValue(message);
     }
   }
 );
 
 export const deleteTask = createAsyncThunk(
   'boards/deleteTask',
-  async ({ taskId, boardId, columnId }: DeleteTaskPayload, { rejectWithValue }) => {
+  async ({ taskId, boardId, columnId }: DeleteTaskPayload, { dispatch, rejectWithValue }) => {
     try {
       await api.delete(`/tasks/${taskId}`);
+      dispatch(showNotification({ message: 'Task deleted successfully!', type: 'success' }));
       return { taskId, boardId, columnId };
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to delete task');
+    } catch (err) {
+      const axiosError = err as { response?: { data?: { message?: string } } };
+      const message = axiosError.response?.data?.message || 'Failed to delete task';
+      dispatch(showNotification({ message, type: 'error' }));
+      return rejectWithValue(message);
     }
   }
 );
 
 export const moveTask = createAsyncThunk(
   'boards/moveTask',
-  async (moveData: MoveTaskPayload, { rejectWithValue }) => {
+  async (moveData: MoveTaskPayload, { dispatch, rejectWithValue }) => {
     try {
       await api.put(`/tasks/${moveData.taskId}/move`, {
         sourceColId: moveData.sourceColId,
@@ -91,8 +107,11 @@ export const moveTask = createAsyncThunk(
         destIndex: moveData.destIndex
       });
       return moveData;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to move task');
+    } catch (err) {
+      const axiosError = err as { response?: { data?: { message?: string } } };
+      const message = axiosError.response?.data?.message || 'Failed to move task';
+      dispatch(showNotification({ message, type: 'error' }));
+      return rejectWithValue(message);
     }
   }
 );
@@ -120,7 +139,7 @@ const boardSlice = createSlice({
         state.loading = false;
         state.boards = action.payload;
         if (state.currentBoard) {
-          state.currentBoard = action.payload.find((b: any) => b.id === state.currentBoard?.id) || null;
+          state.currentBoard = action.payload.find((b: Board) => b.id === state.currentBoard?.id) || null;
         }
       })
       .addCase(fetchBoards.rejected, (state, action) => {
@@ -136,13 +155,13 @@ const boardSlice = createSlice({
         const task = action.payload;
         const board = state.boards.find(b => b.id === task.boardId);
         if (board) {
-          (board as any).tasks.push(task);
+          board.tasks.push(task);
           if (board.columns[task.columnId]) {
             board.columns[task.columnId].taskIds.push(task.id);
           }
         }
         if (state.currentBoard?.id === task.boardId) {
-          (state.currentBoard as any).tasks.push(task);
+          state.currentBoard.tasks.push(task);
           if (state.currentBoard.columns[task.columnId]) {
             state.currentBoard.columns[task.columnId].taskIds.push(task.id);
           }
@@ -153,13 +172,13 @@ const boardSlice = createSlice({
         const { taskId, boardId, columnId } = action.payload;
         const board = state.boards.find(b => b.id === boardId);
         if (board) {
-          (board as any).tasks = (board as any).tasks.filter((t: any) => t.id !== taskId);
+          board.tasks = board.tasks.filter((t: Task) => t.id !== taskId);
           if (board.columns[columnId]) {
             board.columns[columnId].taskIds = board.columns[columnId].taskIds.filter(id => id !== taskId);
           }
         }
         if (state.currentBoard?.id === boardId) {
-          (state.currentBoard as any).tasks = (state.currentBoard as any).tasks.filter((t: any) => t.id !== taskId);
+          state.currentBoard.tasks = state.currentBoard.tasks.filter((t: Task) => t.id !== taskId);
           if (state.currentBoard.columns[columnId]) {
             state.currentBoard.columns[columnId].taskIds = state.currentBoard.columns[columnId].taskIds.filter(id => id !== taskId);
           }
@@ -177,10 +196,10 @@ const boardSlice = createSlice({
           finish.taskIds.splice(destIndex, 0, taskId);
 
           if (sourceColId !== destColId) {
-            const task = (board as any).tasks.find((t: any) => t.id === taskId);
+            const task = board.tasks.find((t: Task) => t.id === taskId);
             if (task) {
               task.columnId = destColId;
-              task.status = destColId.toUpperCase().replace('-', '_');
+              task.status = destColId.toUpperCase().replace('-', '_') as 'TODO' | 'IN_PROGRESS' | 'DONE';
             }
           }
         }
@@ -192,10 +211,10 @@ const boardSlice = createSlice({
           finish.taskIds.splice(destIndex, 0, taskId);
 
           if (sourceColId !== destColId) {
-            const task = (state.currentBoard as any).tasks.find((t: any) => t.id === taskId);
+            const task = state.currentBoard.tasks.find((t: Task) => t.id === taskId);
             if (task) {
               task.columnId = destColId;
-              task.status = destColId.toUpperCase().replace('-', '_');
+              task.status = destColId.toUpperCase().replace('-', '_') as 'TODO' | 'IN_PROGRESS' | 'DONE';
             }
           }
         }

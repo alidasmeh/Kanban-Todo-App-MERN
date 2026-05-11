@@ -9,6 +9,7 @@ import Signup from './pages/Signup';
 import Boards from './pages/Boards';
 import BoardDetail from './pages/BoardDetail';
 import AssignedTasks from './pages/AssignedTasks';
+import Toast from './components/Toast';
 
 function App() {
   const dispatch = useDispatch<AppDispatch>();
@@ -20,6 +21,7 @@ function App() {
 
   return (
     <Router>
+      <Toast />
       <Routes>
         <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/boards" />} />
         <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/boards" />} />

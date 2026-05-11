@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { AuthState } from '../types';
 import api from '../utils/api';
+import { showNotification } from './notificationSlice';
 
 interface LoginCredentials {
   email: string;
@@ -30,26 +31,34 @@ const initialState: AuthState = {
 
 export const login = createAsyncThunk(
   'auth/login',
-  async (credentials: LoginCredentials, { rejectWithValue }) => {
+  async (credentials: LoginCredentials, { dispatch, rejectWithValue }) => {
     try {
       const response = await api.post<AuthResponse>('/auth/login', credentials);
       localStorage.setItem('token', response.data.token);
+      dispatch(showNotification({ message: `Welcome back, ${response.data.name}!`, type: 'success' }));
       return response.data;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Login failed');
+    } catch (err) {
+      const axiosError = err as { response?: { data?: { message?: string } } };
+      const message = axiosError.response?.data?.message || 'Login failed';
+      dispatch(showNotification({ message, type: 'error' }));
+      return rejectWithValue(message);
     }
   }
 );
 
 export const signup = createAsyncThunk(
   'auth/signup',
-  async (userData: SignupData, { rejectWithValue }) => {
+  async (userData: SignupData, { dispatch, rejectWithValue }) => {
     try {
       const response = await api.post<AuthResponse>('/auth/signup', userData);
       localStorage.setItem('token', response.data.token);
+      dispatch(showNotification({ message: 'Account created successfully!', type: 'success' }));
       return response.data;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data?.message || 'Signup failed');
+    } catch (err) {
+      const axiosError = err as { response?: { data?: { message?: string } } };
+      const message = axiosError.response?.data?.message || 'Signup failed';
+      dispatch(showNotification({ message, type: 'error' }));
+      return rejectWithValue(message);
     }
   }
 );
@@ -60,9 +69,10 @@ export const loadUser = createAsyncThunk(
     try {
       const response = await api.get<AuthResponse>('/auth/me');
       return response.data;
-    } catch (err: any) {
+    } catch (err) {
+      const axiosError = err as { response?: { data?: { message?: string } } };
       localStorage.removeItem('token');
-      return rejectWithValue(err.response?.data?.message || 'Failed to load user');
+      return rejectWithValue(axiosError.response?.data?.message || 'Failed to load user');
     }
   }
 );

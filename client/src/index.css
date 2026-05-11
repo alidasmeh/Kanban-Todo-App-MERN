@@ -7,3 +7,35 @@
     @apply bg-surface text-slate-600 font-sans;
   }
 }
+
+@layer utilities {
+  @keyframes slide-in-right {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+      transform: scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+  }
+
+  .animate-toast-in {
+    animation: slide-in-right 0.3s ease-out forwards;
+  }
+
+  .animate-toast-out {
+    animation: fade-out 0.2s ease-in forwards;
+  }
+}
