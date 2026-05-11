@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import Board from '../models/Board';
 import Task from '../models/Task';
+import Team from '../models/Team';
 
 // @desc    Get all boards for user (including tasks)
 // @route   GET /api/boards
@@ -9,11 +10,19 @@ export const getBoards = async (req: Request, res: Response) => {
   const userId = (req as any).user._id;
 
   try {
-    const boards = await Board.find({
+    // Find teams where user is a member or owner
+    const userTeams = await Team.find({
       $or: [
-        { owner: userId },
+        { owners: userId },
         { members: userId }
       ]
+    }).select('_id');
+
+    const teamIds = userTeams.map(team => team._id);
+
+    // Find boards belonging to those teams
+    const boards = await Board.find({
+      team: { $in: teamIds }
     }).lean();
 
     const boardsWithTasks = await Promise.all(boards.map(async (board: any) => {
@@ -25,8 +34,6 @@ export const getBoards = async (req: Request, res: Response) => {
         id: t._id.toString(),
       }));
 
-      // Transform columns taskIds to strings and populate columns with correct task structure if needed
-      // Actually the frontend expects AppBoard which has tasks array and columns map
       return {
         ...board,
         id: board._id.toString(),
@@ -44,8 +51,12 @@ export const getBoards = async (req: Request, res: Response) => {
 // @route   POST /api/boards
 // @access  Private
 export const createBoard = async (req: Request, res: Response) => {
-  const { title, description, category, color } = req.body;
+  const { title, description, category, color, teamId } = req.body;
   const userId = (req as any).user._id;
+
+  if (!teamId) {
+    return res.status(400).json({ message: 'Team ID is required' });
+  }
 
   try {
     const board = await Board.create({
@@ -54,6 +65,7 @@ export const createBoard = async (req: Request, res: Response) => {
       category,
       color,
       owner: userId,
+      team: teamId,
       members: [userId]
     });
 
@@ -67,14 +79,21 @@ export const createBoard = async (req: Request, res: Response) => {
 // @route   GET /api/boards/:id
 // @access  Private
 export const getBoardById = async (req: Request, res: Response) => {
+  const userId = (req as any).user._id;
   try {
     const board = await Board.findById(req.params.id);
-    if (board) {
-      const tasks = await Task.find({ boardId: board._id });
-      res.json({ ...board.toObject(), tasks });
-    } else {
-      res.status(404).json({ message: 'Board not found' });
+    if (!board) {
+      return res.status(404).json({ message: 'Board not found' });
     }
+
+    // Verify user is in the team
+    const team = await Team.findById(board.team);
+    if (!team || (!team.members.includes(userId) && !team.owners.includes(userId))) {
+      return res.status(403).json({ message: 'Access denied' });
+    }
+
+    const tasks = await Task.find({ boardId: board._id });
+    res.json({ ...board.toObject(), id: board._id.toString(), tasks });
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }

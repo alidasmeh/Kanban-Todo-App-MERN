@@ -27,9 +27,25 @@ export interface Board {
   description?: string;
   category?: string;
   color?: string;
+  teamId: string;
   columns: { [key: string]: Column };
   columnOrder: string[];
   tasks: Task[];
+}
+
+export interface Team {
+  id: string;
+  name: string;
+  description?: string;
+  owners: User[];
+  members: User[];
+}
+
+export interface TeamState {
+  teams: Team[];
+  users: User[];
+  loading: boolean;
+  error: string | null;
 }
 
 export interface AuthState {

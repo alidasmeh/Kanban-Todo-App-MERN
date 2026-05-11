@@ -9,6 +9,8 @@ import Signup from './pages/Signup';
 import Boards from './pages/Boards';
 import BoardDetail from './pages/BoardDetail';
 import AssignedTasks from './pages/AssignedTasks';
+import Teams from './pages/Teams';
+import TeamDetail from './pages/TeamDetail';
 import Toast from './components/Toast';
 
 function App() {
@@ -30,6 +32,8 @@ function App() {
         <Route path="/boards" element={isAuthenticated ? <Boards /> : <Navigate to="/login" />} />
         <Route path="/boards/:id" element={isAuthenticated ? <BoardDetail /> : <Navigate to="/login" />} />
         <Route path="/assigned" element={isAuthenticated ? <AssignedTasks /> : <Navigate to="/login" />} />
+        <Route path="/teams" element={isAuthenticated ? <Teams /> : <Navigate to="/login" />} />
+        <Route path="/teams/:id" element={isAuthenticated ? <TeamDetail /> : <Navigate to="/login" />} />
         
         {/* Default Redirect */}
         <Route path="/" element={<Navigate to="/boards" />} />

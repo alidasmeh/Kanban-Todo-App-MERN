@@ -1,20 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from './Modal';
-import { Search, User, X } from 'lucide-react';
+import { Users } from 'lucide-react';
+import { useSelector } from 'react-redux';
+import type { RootState } from '../store';
 
 interface CreateBoardModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreate: (title: string) => void;
+  onCreate: (data: { title: string; teamId: string }) => void;
 }
 
 const CreateBoardModal: React.FC<CreateBoardModalProps> = ({ isOpen, onClose, onCreate }) => {
   const [title, setTitle] = useState('');
+  const [teamId, setTeamId] = useState('');
+  const { teams } = useSelector((state: RootState) => state.teams);
+
+  useEffect(() => {
+    if (teams.length > 0 && !teamId) {
+      setTeamId(teams[0].id);
+    }
+  }, [teams, teamId]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (title.trim()) {
-      onCreate(title);
+    if (title.trim() && teamId) {
+      onCreate({ title, teamId });
       setTitle('');
       onClose();
     }
@@ -38,38 +48,30 @@ const CreateBoardModal: React.FC<CreateBoardModalProps> = ({ isOpen, onClose, on
           />
         </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <label className="text-label-md text-slate-500 uppercase tracking-wider">Add Members</label>
-            <span className="text-[11px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full uppercase">
-              Optional
-            </span>
-          </div>
+        <div className="space-y-2">
+          <label className="text-label-md text-slate-500 uppercase tracking-wider" htmlFor="board-team">
+            Assign to Team
+          </label>
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-            <input
-              className="w-full pl-12 pr-4 py-3 bg-slate-50 rounded-lg border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-body-base"
-              placeholder="Search by name or invite by email..."
-              type="text"
-            />
+            <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+            <select
+              className="w-full pl-12 pr-4 py-3 bg-slate-50 rounded-lg border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-body-base appearance-none cursor-pointer"
+              id="board-team"
+              value={teamId}
+              onChange={(e) => setTeamId(e.target.value)}
+              required
+            >
+              <option value="" disabled>Select a team</option>
+              {teams.map(team => (
+                <option key={team.id} value={team.id}>{team.name}</option>
+              ))}
+            </select>
           </div>
-          
-          <div className="flex flex-wrap gap-2">
-            {[
-              { id: '1', name: 'Sarah Chen' },
-              { id: '2', name: 'Marcus T.' }
-            ].map(user => (
-              <div key={user.id} className="flex items-center gap-2 bg-indigo-50/50 px-3 py-1.5 rounded-full border border-indigo-100">
-                <div className="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center">
-                  <User className="w-3 h-3 text-indigo-600" />
-                </div>
-                <span className="text-body-sm font-bold text-indigo-700">{user.name}</span>
-                <button type="button" className="text-indigo-400 hover:text-indigo-600">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
-          </div>
+          {teams.length === 0 && (
+            <p className="text-[12px] text-amber-600 mt-1 italic">
+              You must be a member of at least one team to create a board.
+            </p>
+          )}
         </div>
 
         <div className="flex justify-end gap-3 pt-4">

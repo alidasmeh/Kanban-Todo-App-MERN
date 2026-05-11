@@ -5,12 +5,14 @@ import {
   Settings, 
   LayoutDashboard, 
   UserCheck, 
+  Users,
   Plus, 
   LogOut,
   Rocket
 } from 'lucide-react';
 import { logout } from '../features/authSlice';
 import { createBoard, fetchBoards } from '../features/boardSlice';
+import { fetchTeams } from '../features/teamSlice';
 import CreateBoardModal from './CreateBoardModal';
 import type { RootState, AppDispatch } from '../store';
 
@@ -28,6 +30,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   useEffect(() => {
     if (isAuthenticated) {
       dispatch(fetchBoards());
+      dispatch(fetchTeams());
     }
   }, [dispatch, isAuthenticated]);
 
@@ -36,13 +39,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     navigate('/login');
   };
 
-  const handleCreateBoard = (title: string) => {
-    dispatch(createBoard({ title }));
+  const handleCreateBoard = (data: { title: string; teamId: string }) => {
+    dispatch(createBoard(data));
   };
 
   const navItems = [
     { name: 'All Boards', icon: LayoutDashboard, path: '/boards' },
     { name: 'Assigned to Me', icon: UserCheck, path: '/assigned' },
+    { name: 'Teams & Users', icon: Users, path: '/teams' },
   ];
 
   return (
