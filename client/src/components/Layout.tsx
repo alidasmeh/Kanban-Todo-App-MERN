@@ -58,25 +58,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             Kinetic Board
           </Link>
         </div>
-        <div className="flex items-center gap-4">
-          <button className="p-2 rounded-full hover:bg-slate-100 transition-colors">
-            <Settings className="w-5 h-5 text-slate-500" />
-          </button>
-        </div>
       </header>
 
       <div className="flex pt-16 ">
         {/* Side Navigation Bar */}
         <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 flex flex-col p-4 border-r border-slate-200 bg-slate-50 z-40 hidden md:flex">
-          <div className="flex items-center gap-3 mb-8 px-2">
-            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white">
-              <Rocket className="w-6 h-6" />
-            </div>
-            <div>
-              <h2 className="text-label-md font-bold text-primary">Workspace</h2>
-              <p className="text-[10px] text-slate-500">Engineering Team</p>
-            </div>
-          </div>
           
           <nav className="flex-1 space-y-1">
             {navItems.map((item) => {
