@@ -33,7 +33,14 @@ const BoardDetail: React.FC = () => {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
   const [openMenuTaskId, setOpenMenuTaskId] = useState<string | null>(null);
+  const [mobileActiveColumn, setMobileActiveColumn] = useState<string>('');
   const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (board && !mobileActiveColumn && board.columnOrder.length > 0) {
+      setMobileActiveColumn(board.columnOrder[0]);
+    }
+  }, [board, mobileActiveColumn]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -96,22 +103,22 @@ const BoardDetail: React.FC = () => {
   return (
     <Layout>
       {/* Board Header */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <header className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 mb-6 xl:mb-8">
         <div>
           <nav className="flex items-center gap-2 text-label-sm text-slate-500 mb-1">
             <Link to="/boards" className="hover:text-primary">Boards</Link>
             <ChevronRight className="w-3.5 h-3.5" />
             <span className="text-primary font-semibold">Kanban Board</span>
           </nav>
-          <h1 className="text-headline-lg text-slate-800">{board.title}</h1>
+          <h1 className="text-headline-md xl:text-headline-lg text-slate-800">{board.title}</h1>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="hidden xl:flex items-center gap-3">
           <button 
             onClick={() => {
               setActiveColumnId('todo');
               setIsTaskModalOpen(true);
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-label-md hover:opacity-90 active:scale-95 transition-all"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-label-md hover:opacity-90 active:scale-95 transition-all w-full xl:w-auto justify-center"
           >
             <Plus className="w-4.5 h-4.5" />
             New Task
@@ -119,18 +126,40 @@ const BoardDetail: React.FC = () => {
         </div>
       </header>
 
+      {/* Mobile Column Switcher */}
+      <nav className="flex xl:hidden w-full bg-slate-100 rounded-xl p-1 mb-6 sticky top-0 z-30">
+        {board.columnOrder.map((colId) => (
+          <button
+            key={colId}
+            onClick={() => setMobileActiveColumn(colId)}
+            className={`flex-1 py-2 text-center rounded-lg transition-all text-label-md ${
+              mobileActiveColumn === colId 
+                ? 'bg-white shadow-sm text-primary font-bold' 
+                : 'text-slate-500 hover:bg-slate-200/50'
+            }`}
+          >
+            {board.columns[colId].title}
+          </button>
+        ))}
+      </nav>
+
       {/* Kanban Board Container */}
       <DragDropContext onDragEnd={onDragEnd}>
-        <div className="flex gap-6 overflow-x-auto pb-6 items-start">
+        <div className="flex xl:gap-6 overflow-x-auto xl:overflow-x-auto pb-6 items-start no-scrollbar">
           {board.columnOrder.map((columnId) => {
             const column = board.columns[columnId];
             const columnTasks = column.taskIds.map((taskId) => board.tasks.find(t => t.id === taskId)!);
 
             return (
-              <div key={column.id} className="min-w-[320px] w-[320px] flex flex-col gap-3">
-                <div className="flex items-center justify-between px-2 mb-2 sticky top-0 bg-slate-100 py-2 z-10">
+              <div 
+                key={column.id} 
+                className={`min-w-full xl:min-w-[320px] xl:w-[320px] flex flex-col gap-3 ${
+                  mobileActiveColumn === columnId ? 'flex' : 'hidden xl:flex'
+                }`}
+              >
+                <div className="hidden xl:flex items-center justify-between px-2 mb-2 sticky top-0 bg-slate-100 py-2 z-10">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-label-md font-bold text-slate-500">{column.title}</h3>
+                    <h3 className="text-label-md font-bold text-slate-500 uppercase">{column.title}</h3>
                     <span className="bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full text-label-sm font-bold">
                       {columnTasks.length}
                     </span>
@@ -142,7 +171,7 @@ const BoardDetail: React.FC = () => {
                     <div
                       {...provided.droppableProps}
                       ref={provided.innerRef}
-                      className={`bg-slate-100/50 rounded-xl p-2 min-h-[500px] flex flex-col gap-3 transition-colors border border-solid border-slate-200 ${
+                      className={`bg-slate-100/50 xl:bg-slate-100/50 rounded-xl p-2 min-h-[500px] flex flex-col gap-3 transition-colors border border-solid border-slate-200 ${
                         snapshot.isDraggingOver ? 'bg-indigo-50/50' : ''
                       }`}
                     >
@@ -159,12 +188,12 @@ const BoardDetail: React.FC = () => {
                                   ? `${provided.draggableProps.style?.transform} rotate(2deg)` 
                                   : provided.draggableProps.style?.transform
                               }}
-                              className={`bg-white p-4 rounded-lg shadow-soft-float border-t-4 group cursor-grab active:cursor-grabbing transition-all ${
+                              className={`bg-white p-4 rounded-lg shadow-soft-float border-l-4 xl:border-l-0 xl:border-t-4 group cursor-grab active:cursor-grabbing transition-all ${
                                 snapshot.isDragging ? 'shadow-xl ring-2 ring-primary z-50' : 'border-slate-200'
                               } ${
-                                task.columnId === 'todo' ? 'border-t-primary' :
-                                task.columnId === 'in-progress' ? 'border-t-orange-400' :
-                                'border-t-emerald-400 grayscale opacity-80'
+                                task.columnId === 'todo' ? 'border-primary' :
+                                task.columnId === 'in-progress' ? 'border-orange-400' :
+                                'border-emerald-400 grayscale opacity-80'
                               }`}
                             >
                               <div className="flex justify-between items-start mb-2">
@@ -222,6 +251,39 @@ const BoardDetail: React.FC = () => {
                                   <span className="text-label-sm">{task.dueDate}</span>
                                 </div>
                               </div>
+
+                              {/* Mobile Quick Status Buttons */}
+                              <div className="flex xl:hidden items-center gap-2 mt-4 pt-4 border-t border-slate-100">
+                                {board.columnOrder.map((colId) => {
+                                  if (colId === task.columnId) return null;
+                                  const targetColumn = board.columns[colId];
+                                  return (
+                                    <button
+                                      key={colId}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        dispatch(moveTaskAction({
+                                          boardId: id || '1',
+                                          sourceColId: task.columnId,
+                                          destColId: colId,
+                                          sourceIndex: column.taskIds.indexOf(task.id),
+                                          destIndex: targetColumn.taskIds.length,
+                                          taskId: task.id
+                                        }));
+                                        setMobileActiveColumn(colId);
+                                      }}
+                                      className={`flex-1 py-1.5 px-2 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all border ${
+                                        colId === 'todo' ? 'text-indigo-600 border-indigo-100 bg-indigo-50 hover:bg-indigo-100' :
+                                        colId === 'in-progress' ? 'text-orange-600 border-orange-100 bg-orange-50 hover:bg-orange-100' :
+                                        'text-emerald-600 border-emerald-100 bg-emerald-50 hover:bg-emerald-100'
+                                      }`}
+                                    >
+                                      Move to {targetColumn.title}
+                                    </button>
+                                  );
+                                })}
+                              </div>
                             </article>
                           )}
                         </Draggable>
@@ -241,6 +303,17 @@ const BoardDetail: React.FC = () => {
         onClose={() => setIsTaskModalOpen(false)} 
         onCreate={handleCreateTask} 
       />
+
+      {/* Mobile Floating Action Button */}
+      <button 
+        onClick={() => {
+          setActiveColumnId(mobileActiveColumn || 'todo');
+          setIsTaskModalOpen(true);
+        }}
+        className="xl:hidden fixed bottom-20 right-6 w-14 h-14 bg-primary text-white rounded-2xl shadow-lg flex items-center justify-center z-50 active:scale-90 transition-transform"
+      >
+        <Plus className="w-8 h-8" />
+      </button>
     </Layout>
   );
 };

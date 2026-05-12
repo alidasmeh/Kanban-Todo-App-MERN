@@ -100,7 +100,7 @@ const TeamDetail: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Members List */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="order-2 lg:order-1 lg:col-span-2 space-y-6">
           <div className="bg-white rounded-xl shadow-soft-float border border-slate-200 overflow-hidden">
             <div className="p-6 border-b border-slate-100 bg-slate-50/50">
               <h3 className="text-headline-md text-slate-800 flex items-center gap-2">
@@ -167,7 +167,7 @@ const TeamDetail: React.FC = () => {
         </div>
 
         {/* Add Members Sidebar */}
-        <div className="space-y-6">
+        <div className="order-1 lg:order-2 space-y-6">
           {isCurrentUserOwner && (
             <div className="bg-white rounded-xl shadow-soft-float border border-slate-200 p-6">
               <h3 className="text-headline-sm text-slate-800 mb-4">Add New Members</h3>

@@ -56,9 +56,9 @@ const Toast: React.FC = () => {
   const { notifications } = useSelector((state: RootState) => state.notification);
 
   return (
-    <div className="fixed top-6 right-6 z-[9999] flex flex-col gap-3 w-80 pointer-events-none">
+    <div className="fixed top-4 left-1/2 -translate-x-1/2 md:left-auto md:right-6 md:translate-x-0 z-[9999] flex flex-col gap-3 w-[95%] md:w-80 pointer-events-none">
       {notifications.map((n) => (
-        <div key={n.id} className="pointer-events-auto">
+        <div key={n.id} className="pointer-events-auto w-full">
           <ToastItem id={n.id} message={n.message} type={n.type} />
         </div>
       ))}
