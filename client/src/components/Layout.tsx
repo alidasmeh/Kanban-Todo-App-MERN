@@ -8,7 +8,8 @@ import {
   Users,
   Plus, 
   LogOut,
-  Rocket
+  Rocket,
+  User
 } from 'lucide-react';
 import { logout } from '../features/authSlice';
 import { createBoard, fetchBoards } from '../features/boardSlice';
@@ -25,7 +26,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -94,6 +95,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </button>
 
           <div className="mt-auto space-y-1 border-t border-outline-variant pt-4">
+            {user && (
+              <div className="flex items-center gap-3 px-3 py-2 mb-2">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                  <User className="w-4 h-4" />
+                </div>
+                <div className="flex flex-col overflow-hidden">
+                  <span className="text-label-sm font-bold text-slate-700 truncate">{user.name}</span>
+                  <span className="text-[10px] text-slate-500 truncate">{user.email}</span>
+                </div>
+              </div>
+            )}
             <button 
               onClick={handleLogout}
               className="flex items-center gap-3 px-3 py-2 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all w-full text-left"
