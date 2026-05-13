@@ -83,7 +83,7 @@ export const createTask = createAsyncThunk(
 
 export const updateTask = createAsyncThunk(
   'boards/updateTask',
-  async (taskData: Partial<Task> & { id: string }, { dispatch, rejectWithValue }) => {
+  async (taskData: { id: string } & Partial<Omit<Task, 'assignee'> & { assignee: string }>, { dispatch, rejectWithValue }) => {
     try {
       const { id, ...updateData } = taskData;
       const response = await api.put<Task & { _id: string }>(`/tasks/${id}`, updateData);

@@ -1,4 +1,22 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
+
+export interface IColumn {
+  id: string;
+  title: string;
+  taskIds: mongoose.Types.ObjectId[];
+}
+
+export interface IBoard extends Document {
+  title: string;
+  description?: string;
+  category?: string;
+  color: string;
+  owner: mongoose.Types.ObjectId;
+  team: mongoose.Types.ObjectId;
+  members: mongoose.Types.ObjectId[];
+  columns: Map<string, IColumn>;
+  columnOrder: string[];
+}
 
 const columnSchema = new mongoose.Schema({
   id: { type: String, required: true },
@@ -52,6 +70,6 @@ const boardSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-const Board = mongoose.model('Board', boardSchema);
+const Board = mongoose.model<IBoard>('Board', boardSchema);
 
 export default Board;

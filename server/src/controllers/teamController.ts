@@ -1,12 +1,14 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import Team from '../models/Team';
 import User from '../models/User';
+import { AuthRequest } from '../types';
 
 // @desc    Get all teams for user
 // @route   GET /api/teams
 // @access  Private
 export const getTeams = async (req: Request, res: Response) => {
-  const userId = (req as any).user._id;
+  const userId = (req as AuthRequest).user._id;
 
   try {
     const teams = await Team.find({
@@ -14,7 +16,8 @@ export const getTeams = async (req: Request, res: Response) => {
         { owners: userId },
         { members: userId }
       ]
-    }).populate('members', 'name email').populate('owners', 'name email');
+    }).populate('owners members', 'name email');
+
     res.json(teams);
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
@@ -26,17 +29,17 @@ export const getTeams = async (req: Request, res: Response) => {
 // @access  Private
 export const createTeam = async (req: Request, res: Response) => {
   const { name, description } = req.body;
-  const userId = (req as any).user._id;
+  const userId = (req as AuthRequest).user._id;
 
   try {
     const team = await Team.create({
       name,
       description,
       owners: [userId],
-      members: [userId]
+      members: []
     });
 
-    const populatedTeam = await team.populate('members', 'name email');
+    const populatedTeam = await Team.findById(team._id).populate('owners members', 'name email');
     res.status(201).json(populatedTeam);
   } catch (error) {
     res.status(400).json({ message: (error as Error).message });
@@ -46,10 +49,10 @@ export const createTeam = async (req: Request, res: Response) => {
 // @desc    Add member to team
 // @route   POST /api/teams/:id/members
 // @access  Private
-export const addMemberToTeam = async (req: Request, res: Response) => {
+export const addMember = async (req: Request, res: Response) => {
   const { userId } = req.body;
   const teamId = req.params.id;
-  const currentUserId = (req as any).user._id;
+  const currentUserId = (req as AuthRequest).user._id;
 
   try {
     const team = await Team.findById(teamId);
@@ -58,19 +61,22 @@ export const addMemberToTeam = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Team not found' });
     }
 
-    if (!team.owners.some(id => id.toString() === currentUserId.toString())) {
-      return res.status(403).json({ message: 'Only team owners can add members' });
+    // Only owners can add members
+    if (!team.owners.some(id => id.equals(currentUserId as mongoose.Types.ObjectId))) {
+      return res.status(403).json({ message: 'Not authorized' });
     }
 
-    if (team.members.includes(userId)) {
-      return res.status(400).json({ message: 'User is already a member' });
+    const userIdObj = new mongoose.Types.ObjectId(userId as string);
+
+    if (team.members.some(id => id.equals(userIdObj)) || team.owners.some(id => id.equals(userIdObj))) {
+      return res.status(400).json({ message: 'User already in team' });
     }
 
-    team.members.push(userId);
+    team.members.push(userIdObj);
     await team.save();
 
-    const updatedTeam = await Team.findById(teamId).populate('members', 'name email').populate('owners', 'name email');
-    res.json(updatedTeam);
+    const populatedTeam = await Team.findById(team._id).populate('owners members', 'name email');
+    res.json(populatedTeam);
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }
@@ -79,10 +85,10 @@ export const addMemberToTeam = async (req: Request, res: Response) => {
 // @desc    Remove member from team
 // @route   DELETE /api/teams/:id/members/:userId
 // @access  Private
-export const removeMemberFromTeam = async (req: Request, res: Response) => {
+export const removeMember = async (req: Request, res: Response) => {
   const { userId } = req.params;
   const teamId = req.params.id;
-  const currentUserId = (req as any).user._id;
+  const currentUserId = (req as AuthRequest).user._id;
 
   try {
     const team = await Team.findById(teamId);
@@ -91,36 +97,30 @@ export const removeMemberFromTeam = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Team not found' });
     }
 
-    const isOwner = team.owners.some(id => id.toString() === currentUserId.toString());
-    const isTargetSelf = userId === currentUserId.toString();
-
-    if (!isOwner && !isTargetSelf) {
-      return res.status(403).json({ message: 'Unauthorized to remove member' });
-    }
-
-    // Cannot remove the last owner
-    if (team.owners.some(id => id.toString() === userId) && team.owners.length === 1) {
-      return res.status(400).json({ message: 'Cannot remove the last team owner' });
+    // Only owners can remove members
+    if (!team.owners.some(id => id.equals(currentUserId as mongoose.Types.ObjectId))) {
+      return res.status(403).json({ message: 'Not authorized' });
     }
 
     team.members = team.members.filter((id) => id.toString() !== userId);
-    team.owners = team.owners.filter((id) => id.toString() !== userId) as any;
+    team.owners = team.owners.filter((id) => id.toString() !== userId);
+    
     await team.save();
 
-    const updatedTeam = await Team.findById(teamId).populate('members', 'name email').populate('owners', 'name email');
-    res.json(updatedTeam);
+    const populatedTeam = await Team.findById(team._id).populate('owners members', 'name email');
+    res.json(populatedTeam);
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }
 };
 
-// @desc    Toggle admin status for a member
+// @desc    Toggle admin status
 // @route   PUT /api/teams/:id/members/:userId/admin
 // @access  Private
-export const toggleAdminStatus = async (req: Request, res: Response) => {
+export const toggleAdmin = async (req: Request, res: Response) => {
   const { userId } = req.params;
   const teamId = req.params.id;
-  const currentUserId = (req as any).user._id;
+  const currentUserId = (req as AuthRequest).user._id;
 
   try {
     const team = await Team.findById(teamId);
@@ -129,35 +129,35 @@ export const toggleAdminStatus = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Team not found' });
     }
 
-    if (!team.owners.some(id => id.toString() === currentUserId.toString())) {
-      return res.status(403).json({ message: 'Only team owners can toggle admin status' });
+    // Only owners can toggle admin status
+    if (!team.owners.includes(currentUserId as mongoose.Types.ObjectId)) {
+      return res.status(403).json({ message: 'Not authorized' });
     }
 
-    if (!team.members.some(id => id.toString() === userId)) {
-      return res.status(400).json({ message: 'User is not a member of this team' });
-    }
+    const isOwner = team.owners.includes(new mongoose.Types.ObjectId(userId as string));
 
-    const isAlreadyOwner = team.owners.some(id => id.toString() === userId);
-
-    if (isAlreadyOwner) {
+    if (isOwner) {
+      // Don't remove last owner
       if (team.owners.length === 1) {
-        return res.status(400).json({ message: 'Cannot revoke admin status from the last owner' });
+        return res.status(400).json({ message: 'Cannot remove last owner' });
       }
-      team.owners = team.owners.filter(id => id.toString() !== userId) as any;
+      team.owners = team.owners.filter(id => id.toString() !== userId);
+      team.members.push(new mongoose.Types.ObjectId(userId as string));
     } else {
-      team.owners.push(userId as any);
+      team.members = team.members.filter(id => id.toString() !== userId);
+      team.owners.push(new mongoose.Types.ObjectId(userId as string));
     }
 
     await team.save();
 
-    const updatedTeam = await Team.findById(teamId).populate('members', 'name email').populate('owners', 'name email');
-    res.json(updatedTeam);
+    const populatedTeam = await Team.findById(team._id).populate('owners members', 'name email');
+    res.json(populatedTeam);
   } catch (error) {
     res.status(500).json({ message: (error as Error).message });
   }
 };
 
-// @desc    Get all users (for adding to teams)
+// @desc    Get all users
 // @route   GET /api/teams/users
 // @access  Private
 export const getAllUsers = async (req: Request, res: Response) => {

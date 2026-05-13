@@ -8,13 +8,16 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
 const morgan_1 = __importDefault(require("morgan"));
 const db_1 = __importDefault(require("./config/db"));
+const initDefaults_1 = require("./utils/initDefaults");
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 const boardRoutes_1 = __importDefault(require("./routes/boardRoutes"));
 const taskRoutes_1 = __importDefault(require("./routes/taskRoutes"));
 const teamRoutes_1 = __importDefault(require("./routes/teamRoutes"));
 dotenv_1.default.config();
 // Connect to database
-(0, db_1.default)();
+(0, db_1.default)().then(() => {
+    (0, initDefaults_1.initDefaults)();
+});
 const app = (0, express_1.default)();
 // Middleware
 app.use((0, cors_1.default)());

@@ -1,7 +1,9 @@
 import { Request, Response } from 'express';
-import User from '../models/User';
+import mongoose from 'mongoose';
+import User, { IUser } from '../models/User';
 import Team from '../models/Team';
 import generateToken from '../utils/generateToken';
+import { AuthRequest } from '../types';
 
 // @desc    Auth user & get token
 // @route   POST /api/auth/login
@@ -11,7 +13,7 @@ export const authUser = async (req: Request, res: Response) => {
 
   const user = await User.findOne({ email });
 
-  if (user && (await (user as any).matchPassword(password))) {
+  if (user && (await user.matchPassword(password))) {
     res.json({
       _id: user._id,
       name: user.name,
@@ -46,7 +48,7 @@ export const registerUser = async (req: Request, res: Response) => {
     // Add user to "Everyone" team
     const everyoneTeam = await Team.findOne({ name: 'Everyone' });
     if (everyoneTeam) {
-      everyoneTeam.members.push(user._id as any);
+      everyoneTeam.members.push(user._id as mongoose.Types.ObjectId);
       await everyoneTeam.save();
     }
 
@@ -65,7 +67,7 @@ export const registerUser = async (req: Request, res: Response) => {
 // @route   GET /api/auth/me
 // @access  Private
 export const getUserProfile = async (req: Request, res: Response) => {
-  const user = (req as any).user;
+  const user = (req as AuthRequest).user;
 
   if (user) {
     res.json({

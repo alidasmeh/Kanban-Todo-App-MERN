@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getUserProfile = exports.registerUser = exports.authUser = void 0;
 const User_1 = __importDefault(require("../models/User"));
+const Team_1 = __importDefault(require("../models/Team"));
 const generateToken_1 = __importDefault(require("../utils/generateToken"));
 // @desc    Auth user & get token
 // @route   POST /api/auth/login
@@ -41,6 +42,12 @@ const registerUser = async (req, res) => {
         password,
     });
     if (user) {
+        // Add user to "Everyone" team
+        const everyoneTeam = await Team_1.default.findOne({ name: 'Everyone' });
+        if (everyoneTeam) {
+            everyoneTeam.members.push(user._id);
+            await everyoneTeam.save();
+        }
         res.status(201).json({
             _id: user._id,
             name: user.name,

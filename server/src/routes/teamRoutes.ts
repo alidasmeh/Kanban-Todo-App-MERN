@@ -2,10 +2,10 @@ import express from 'express';
 import { 
   getTeams, 
   createTeam, 
-  addMemberToTeam, 
-  removeMemberFromTeam,
+  addMember, 
+  removeMember,
   getAllUsers,
-  toggleAdminStatus
+  toggleAdmin
 } from '../controllers/teamController';
 import { protect } from '../middleware/authMiddleware';
 
@@ -17,8 +17,8 @@ router.route('/')
 
 router.get('/users', protect, getAllUsers);
 
-router.post('/:id/members', protect, addMemberToTeam);
-router.delete('/:id/members/:userId', protect, removeMemberFromTeam);
-router.put('/:id/members/:userId/admin', protect, toggleAdminStatus);
+router.post('/:id/members', protect, addMember);
+router.delete('/:id/members/:userId', protect, removeMember);
+router.put('/:id/members/:userId/admin', protect, toggleAdmin);
 
 export default router;

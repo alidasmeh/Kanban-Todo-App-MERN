@@ -4,13 +4,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.moveTask = exports.deleteTask = exports.updateTask = exports.createTask = void 0;
+const mongoose_1 = __importDefault(require("mongoose"));
 const Task_1 = __importDefault(require("../models/Task"));
 const Board_1 = __importDefault(require("../models/Board"));
 // @desc    Create a new task
 // @route   POST /api/tasks
 // @access  Private
 const createTask = async (req, res) => {
-    const { title, description, dueDate, boardId, columnId, status } = req.body;
+    const { title, description, dueDate, boardId, columnId, status, assignee } = req.body;
     try {
         const task = await Task_1.default.create({
             title,
@@ -19,8 +20,9 @@ const createTask = async (req, res) => {
             boardId,
             columnId,
             status: status || 'TODO',
-            assignee: req.user._id
+            assignee: assignee || req.user._id
         });
+        const populatedTask = await Task_1.default.findById(task._id).populate('assignee', 'name email');
         // Update Board columns taskIds
         const board = await Board_1.default.findById(boardId);
         if (board) {
@@ -31,7 +33,7 @@ const createTask = async (req, res) => {
                 await board.save();
             }
         }
-        res.status(201).json(task);
+        res.status(201).json(populatedTask);
     }
     catch (error) {
         res.status(400).json({ message: error.message });
@@ -50,8 +52,10 @@ const updateTask = async (req, res) => {
             task.dueDate = req.body.dueDate || task.dueDate;
             task.status = req.body.status || task.status;
             task.columnId = req.body.columnId || task.columnId;
+            task.assignee = req.body.assignee || task.assignee;
             const updatedTask = await task.save();
-            res.json(updatedTask);
+            const populatedTask = await Task_1.default.findById(updatedTask._id).populate('assignee', 'name email');
+            res.json(populatedTask);
         }
         else {
             res.status(404).json({ message: 'Task not found' });
@@ -115,7 +119,7 @@ const moveTask = async (req, res) => {
         // Remove from source
         sourceCol.taskIds.splice(sourceIndex, 1);
         // Add to destination
-        destCol.taskIds.splice(destIndex, 0, taskId);
+        destCol.taskIds.splice(destIndex, 0, new mongoose_1.default.Types.ObjectId(taskId));
         // Update task status and columnId if moved between columns
         if (sourceColId !== destColId) {
             task.columnId = destColId;

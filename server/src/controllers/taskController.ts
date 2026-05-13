@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import Task from '../models/Task';
 import Board from '../models/Board';
+import { AuthRequest } from '../types';
 
 // @desc    Create a new task
 // @route   POST /api/tasks
@@ -16,7 +18,7 @@ export const createTask = async (req: Request, res: Response) => {
       boardId,
       columnId,
       status: status || 'TODO',
-      assignee: assignee || (req as any).user._id
+      assignee: assignee || (req as AuthRequest).user._id
     });
 
     const populatedTask = await Task.findById(task._id).populate('assignee', 'name email');
@@ -26,7 +28,7 @@ export const createTask = async (req: Request, res: Response) => {
     if (board) {
       const column = board.columns.get(columnId);
       if (column) {
-        column.taskIds.push(task._id as any);
+        column.taskIds.push(task._id as mongoose.Types.ObjectId);
         board.markModified('columns');
         await board.save();
       }
@@ -124,12 +126,12 @@ export const moveTask = async (req: Request, res: Response) => {
     sourceCol.taskIds.splice(sourceIndex, 1);
     
     // Add to destination
-    destCol.taskIds.splice(destIndex, 0, taskId as any);
+    destCol.taskIds.splice(destIndex, 0, new mongoose.Types.ObjectId(taskId as string));
 
     // Update task status and columnId if moved between columns
     if (sourceColId !== destColId) {
       task.columnId = destColId;
-      task.status = destColId.toUpperCase().replace('-', '_') as any;
+      task.status = destColId.toUpperCase().replace('-', '_') as 'TODO' | 'IN_PROGRESS' | 'DONE';
       await task.save();
     }
 

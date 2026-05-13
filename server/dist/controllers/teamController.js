@@ -3,7 +3,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllUsers = exports.toggleAdminStatus = exports.removeMemberFromTeam = exports.addMemberToTeam = exports.createTeam = exports.getTeams = void 0;
+exports.getAllUsers = exports.toggleAdmin = exports.removeMember = exports.addMember = exports.createTeam = exports.getTeams = void 0;
+const mongoose_1 = __importDefault(require("mongoose"));
 const Team_1 = __importDefault(require("../models/Team"));
 const User_1 = __importDefault(require("../models/User"));
 // @desc    Get all teams for user
@@ -17,7 +18,7 @@ const getTeams = async (req, res) => {
                 { owners: userId },
                 { members: userId }
             ]
-        }).populate('members', 'name email').populate('owners', 'name email');
+        }).populate('owners members', 'name email');
         res.json(teams);
     }
     catch (error) {
@@ -36,9 +37,9 @@ const createTeam = async (req, res) => {
             name,
             description,
             owners: [userId],
-            members: [userId]
+            members: []
         });
-        const populatedTeam = await team.populate('members', 'name email');
+        const populatedTeam = await Team_1.default.findById(team._id).populate('owners members', 'name email');
         res.status(201).json(populatedTeam);
     }
     catch (error) {
@@ -49,7 +50,7 @@ exports.createTeam = createTeam;
 // @desc    Add member to team
 // @route   POST /api/teams/:id/members
 // @access  Private
-const addMemberToTeam = async (req, res) => {
+const addMember = async (req, res) => {
     const { userId } = req.body;
     const teamId = req.params.id;
     const currentUserId = req.user._id;
@@ -58,26 +59,27 @@ const addMemberToTeam = async (req, res) => {
         if (!team) {
             return res.status(404).json({ message: 'Team not found' });
         }
-        if (!team.owners.some(id => id.toString() === currentUserId.toString())) {
-            return res.status(403).json({ message: 'Only team owners can add members' });
+        // Only owners can add members
+        if (!team.owners.includes(currentUserId)) {
+            return res.status(403).json({ message: 'Not authorized' });
         }
-        if (team.members.includes(userId)) {
-            return res.status(400).json({ message: 'User is already a member' });
+        if (team.members.includes(userId) || team.owners.includes(userId)) {
+            return res.status(400).json({ message: 'User already in team' });
         }
         team.members.push(userId);
         await team.save();
-        const updatedTeam = await Team_1.default.findById(teamId).populate('members', 'name email').populate('owners', 'name email');
-        res.json(updatedTeam);
+        const populatedTeam = await Team_1.default.findById(team._id).populate('owners members', 'name email');
+        res.json(populatedTeam);
     }
     catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
-exports.addMemberToTeam = addMemberToTeam;
+exports.addMember = addMember;
 // @desc    Remove member from team
 // @route   DELETE /api/teams/:id/members/:userId
 // @access  Private
-const removeMemberFromTeam = async (req, res) => {
+const removeMember = async (req, res) => {
     const { userId } = req.params;
     const teamId = req.params.id;
     const currentUserId = req.user._id;
@@ -86,30 +88,25 @@ const removeMemberFromTeam = async (req, res) => {
         if (!team) {
             return res.status(404).json({ message: 'Team not found' });
         }
-        const isOwner = team.owners.some(id => id.toString() === currentUserId.toString());
-        const isTargetSelf = userId === currentUserId.toString();
-        if (!isOwner && !isTargetSelf) {
-            return res.status(403).json({ message: 'Unauthorized to remove member' });
-        }
-        // Cannot remove the last owner
-        if (team.owners.some(id => id.toString() === userId) && team.owners.length === 1) {
-            return res.status(400).json({ message: 'Cannot remove the last team owner' });
+        // Only owners can remove members
+        if (!team.owners.includes(currentUserId)) {
+            return res.status(403).json({ message: 'Not authorized' });
         }
         team.members = team.members.filter((id) => id.toString() !== userId);
         team.owners = team.owners.filter((id) => id.toString() !== userId);
         await team.save();
-        const updatedTeam = await Team_1.default.findById(teamId).populate('members', 'name email').populate('owners', 'name email');
-        res.json(updatedTeam);
+        const populatedTeam = await Team_1.default.findById(team._id).populate('owners members', 'name email');
+        res.json(populatedTeam);
     }
     catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
-exports.removeMemberFromTeam = removeMemberFromTeam;
-// @desc    Toggle admin status for a member
+exports.removeMember = removeMember;
+// @desc    Toggle admin status
 // @route   PUT /api/teams/:id/members/:userId/admin
 // @access  Private
-const toggleAdminStatus = async (req, res) => {
+const toggleAdmin = async (req, res) => {
     const { userId } = req.params;
     const teamId = req.params.id;
     const currentUserId = req.user._id;
@@ -118,32 +115,33 @@ const toggleAdminStatus = async (req, res) => {
         if (!team) {
             return res.status(404).json({ message: 'Team not found' });
         }
-        if (!team.owners.some(id => id.toString() === currentUserId.toString())) {
-            return res.status(403).json({ message: 'Only team owners can toggle admin status' });
+        // Only owners can toggle admin status
+        if (!team.owners.includes(currentUserId)) {
+            return res.status(403).json({ message: 'Not authorized' });
         }
-        if (!team.members.some(id => id.toString() === userId)) {
-            return res.status(400).json({ message: 'User is not a member of this team' });
-        }
-        const isAlreadyOwner = team.owners.some(id => id.toString() === userId);
-        if (isAlreadyOwner) {
+        const isOwner = team.owners.includes(new mongoose_1.default.Types.ObjectId(userId));
+        if (isOwner) {
+            // Don't remove last owner
             if (team.owners.length === 1) {
-                return res.status(400).json({ message: 'Cannot revoke admin status from the last owner' });
+                return res.status(400).json({ message: 'Cannot remove last owner' });
             }
             team.owners = team.owners.filter(id => id.toString() !== userId);
+            team.members.push(new mongoose_1.default.Types.ObjectId(userId));
         }
         else {
-            team.owners.push(userId);
+            team.members = team.members.filter(id => id.toString() !== userId);
+            team.owners.push(new mongoose_1.default.Types.ObjectId(userId));
         }
         await team.save();
-        const updatedTeam = await Team_1.default.findById(teamId).populate('members', 'name email').populate('owners', 'name email');
-        res.json(updatedTeam);
+        const populatedTeam = await Team_1.default.findById(team._id).populate('owners members', 'name email');
+        res.json(populatedTeam);
     }
     catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
-exports.toggleAdminStatus = toggleAdminStatus;
-// @desc    Get all users (for adding to teams)
+exports.toggleAdmin = toggleAdmin;
+// @desc    Get all users
 // @route   GET /api/teams/users
 // @access  Private
 const getAllUsers = async (req, res) => {

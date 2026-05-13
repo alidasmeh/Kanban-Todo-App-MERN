@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
-import User from '../models/User';
+import User, { IUser } from '../models/User';
+import { AuthRequest } from '../types';
 
 interface DecodedToken {
   id: string;
@@ -19,7 +20,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction) =
         return res.status(401).json({ message: 'Not authorized, user not found' });
       }
 
-      (req as any).user = user;
+      (req as AuthRequest).user = user;
       next();
     } catch (error) {
       console.error(error);

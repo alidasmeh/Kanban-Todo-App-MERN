@@ -1,4 +1,11 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
+
+export interface ITeam extends Document {
+  name: string;
+  description?: string;
+  owners: mongoose.Types.ObjectId[];
+  members: mongoose.Types.ObjectId[];
+}
 
 const teamSchema = new mongoose.Schema({
   name: {
@@ -21,6 +28,6 @@ const teamSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-const Team = mongoose.model('Team', teamSchema);
+const Team = mongoose.model<ITeam>('Team', teamSchema);
 
 export default Team;

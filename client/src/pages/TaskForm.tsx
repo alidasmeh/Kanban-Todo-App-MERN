@@ -5,7 +5,7 @@ import { Rocket, Calendar, AlertCircle, ChevronLeft, Save, User as UserIcon } fr
 import Layout from '../components/Layout';
 import type { AppDispatch, RootState } from '../store';
 import { createTask, updateTask } from '../features/boardSlice';
-import type { Task, Board, User } from '../types';
+import type { Task, Board } from '../types';
 
 const TaskForm: React.FC = () => {
   const { boardId, taskId } = useParams<{ boardId: string; taskId?: string }>();

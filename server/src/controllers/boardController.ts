@@ -1,13 +1,15 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import Board from '../models/Board';
 import Task from '../models/Task';
 import Team from '../models/Team';
+import { AuthRequest } from '../types';
 
 // @desc    Get all boards for user (including tasks)
 // @route   GET /api/boards
 // @access  Private
 export const getBoards = async (req: Request, res: Response) => {
-  const userId = (req as any).user._id;
+  const userId = (req as AuthRequest).user._id;
 
   try {
     // Find teams where user is a member or owner
@@ -25,19 +27,26 @@ export const getBoards = async (req: Request, res: Response) => {
       team: { $in: teamIds }
     }).lean();
 
-    const boardsWithTasks = await Promise.all(boards.map(async (board: any) => {
+    const boardsWithTasks = await Promise.all(boards.map(async (board) => {
       const tasks = await Task.find({ boardId: board._id }).populate('assignee', 'name email').lean();
       
       // Transform tasks to match frontend structure (mapping _id to id)
-      const transformedTasks = tasks.map((t: any) => ({
-        ...t,
-        id: t._id.toString(),
-        assignee: t.assignee ? { ...t.assignee, id: t.assignee._id.toString() } : undefined
-      }));
+      const transformedTasks = tasks.map((t) => {
+        const assignee = t.assignee as { _id: mongoose.Types.ObjectId, name: string, email: string } | undefined;
+        return {
+          ...t,
+          id: (t._id as mongoose.Types.ObjectId).toString(),
+          assignee: assignee ? { 
+            id: assignee._id.toString(),
+            name: assignee.name,
+            email: assignee.email
+          } : undefined
+        };
+      });
 
       return {
         ...board,
-        id: board._id.toString(),
+        id: (board._id as mongoose.Types.ObjectId).toString(),
         tasks: transformedTasks
       };
     }));
@@ -53,7 +62,7 @@ export const getBoards = async (req: Request, res: Response) => {
 // @access  Private
 export const createBoard = async (req: Request, res: Response) => {
   const { title, description, category, color, teamId, team: teamProp } = req.body;
-  const userId = (req as any).user._id;
+  const userId = (req as AuthRequest).user._id;
 
   const actualTeamId = teamId || teamProp;
 
@@ -82,7 +91,7 @@ export const createBoard = async (req: Request, res: Response) => {
 // @route   GET /api/boards/:id
 // @access  Private
 export const getBoardById = async (req: Request, res: Response) => {
-  const userId = (req as any).user._id;
+  const userId = (req as AuthRequest).user._id;
   try {
     const board = await Board.findById(req.params.id);
     if (!board) {
@@ -91,7 +100,8 @@ export const getBoardById = async (req: Request, res: Response) => {
 
     // Verify user is in the team
     const team = await Team.findById(board.team);
-    if (!team || (!team.members.includes(userId) && !team.owners.includes(userId))) {
+    const userIdObj = userId as mongoose.Types.ObjectId;
+    if (!team || (!team.members.some(id => id.equals(userIdObj)) && !team.owners.some(id => id.equals(userIdObj)))) {
       return res.status(403).json({ message: 'Access denied' });
     }
 

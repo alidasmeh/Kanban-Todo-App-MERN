@@ -2,13 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { 
-  Settings, 
   LayoutDashboard, 
   UserCheck, 
   Users,
   Plus, 
   LogOut,
-  Rocket,
   User
 } from 'lucide-react';
 import { logout } from '../features/authSlice';
