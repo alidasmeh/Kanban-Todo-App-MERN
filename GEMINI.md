@@ -8,7 +8,11 @@
 * **Development Environment:** Use dockerfile and docker-compose.yml file to manage services. 
 
 ## Mandatory Constraints
-* **No `any` Types:** Strict TypeScript usage is required; do not use `any`.
+* **Strict Type Safety (Zero `any` Policy):**
+  * NEVER use the `any` type under any circumstances.
+  * Avoid type assertions (e.g., `as any`) unless absolutely necessary for complex external library interop, and even then, prefer more specific types or `unknown` with type guards.
+  * Ensure all Mongoose models, Express requests, and Redux slices have comprehensive, explicit interfaces.
+  * Use `mongoose.Types.ObjectId` specifically for ID fields in the backend to ensure compatibility.
 * **State Management:** Abstract all server interactions (fetching, creating, updating) through Redux. Avoid direct API calls in components.
 * **Notifications:** Every server-side action (create, update, delete, etc.) must trigger a toast notification (success/error) to inform the user about the action's status.
 * **Design Source:** All UI code must strictly follow the specifications generated in `DESIGN.md`.

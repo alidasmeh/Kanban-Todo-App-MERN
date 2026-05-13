@@ -26,6 +26,7 @@ For brevity and clarity, in some conversations, only [CODE] is written instead o
 20. [Update Readme](#update-readme)
 21. [Fix type any variables](#fix-type-any-variables) 
 22. [Debug endpoints errors due to type any updates](#debug-endpoints-errors-due-to-type-any-updates)
+23. [Update GEMINI.md to prevent type any](#update-geminimd-to-prevent-type-any)
 
 ## Index For Code Assistant [#](#gemini-code-assistant)
 1. [Delete edit button](#delete-edit-button)
@@ -11173,6 +11174,43 @@ Configured MCP servers:
    3. Verification: Ran the client build process and confirmed it completes successfully.
 
   The platform's endpoints are now functional again, and the codebase remains fully compliant with the strict typing mandate.
+
+
+## Update GEMINI.md to prevent type any
+> update the gemini.md to make sure next time you are not going to use type any                                                                                                                                      
+                                                                                                                                                                                                                      
+
+  Strengthening Type Safety Mandate: Strengthening the prohibition of 'any' types in GEMINI.md.
+
+  ✓  ReadFile  GEMINI.md
+  ✓  Edit  GEMINI.md → Accepted (+5, -1)
+
+       8   * **Development Environment:** Use dockerfile and docker-compose.yml file to manage services. 
+       9
+      10   ## Mandatory Constraints
+      11 - * **No `any` Types:** Strict TypeScript usage is required; do not use `any`.
+      11 + * **Strict Type Safety (Zero `any` Policy):**
+      12 +   * NEVER use the `any` type under any circumstances.
+      13 +   * Avoid type assertions (e.g., `as any`) unless absolutely necessary for complex external library interop, and even then, prefer more specific types or `unknown` with type guards.
+      14 +   * Ensure all Mongoose models, Express requests, and Redux slices have comprehensive, explicit interfaces.
+      15 +   * Use `mongoose.Types.ObjectId` specifically for ID fields in the backend to ensure compatibility.
+      16   * **State Management:** Abstract all server interactions (fetching, creating, updating) through Redux. Avoid direct API calls in components.
+      17   * **Notifications:** Every server-side action (create, update, delete, etc.) must trigger a toast notification (success/error) to inform the user about the action's status.
+      18   * **Design Source:** All UI code must strictly follow the specifications generated in `DESIGN.md`.
+
+  Project Milestone Achieved: Completed the documentation and type safety enforcement project.
+
+
+✦ I have updated GEMINI.md to establish a Strict Type Safety (Zero any Policy). This updated mandate ensures that the use of any is forbidden and provides specific guidance on maintaining explicit interfaces across
+  the entire stack.
+
+  Highlights of the Updated GEMINI.md:
+   * Prohibition: Explicitly states to NEVER use the any type.
+   * Assertions: discourages the use of as any type assertions.
+   * Consistency: Requires comprehensive interfaces for Models, Requests, and Redux slices.
+   * Compatibility: Mandates the use of mongoose.Types.ObjectId for ID fields in the backend to prevent the "string vs object" type mismatches encountered earlier.
+
+  This change, combined with the project-wide refactoring already completed, ensures a high standard of code quality and maintainability for all future development.
 
 ------ 
 ------ 
