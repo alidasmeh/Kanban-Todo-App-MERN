@@ -8,6 +8,7 @@ import type { Board } from '../types';
 
 const AssignedTasks: React.FC = () => {
   const { boards } = useSelector((state: RootState) => state.boards);
+  const { user } = useSelector((state: RootState) => state.auth);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -18,7 +19,9 @@ const AssignedTasks: React.FC = () => {
     }, {} as Record<string, Board>);
   }, [boards]);
 
-  const taskList = boards.flatMap(board => board.tasks);
+  const taskList = useMemo(() => {
+    return boards.flatMap(board => board.tasks.filter(task => task.assignee?.id === user?.id));
+  }, [boards, user]);
 
   const filteredTasks = useMemo(() => {
     if (!searchQuery.trim()) return taskList;

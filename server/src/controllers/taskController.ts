@@ -6,7 +6,7 @@ import Board from '../models/Board';
 // @route   POST /api/tasks
 // @access  Private
 export const createTask = async (req: Request, res: Response) => {
-  const { title, description, dueDate, boardId, columnId, status } = req.body;
+  const { title, description, dueDate, boardId, columnId, status, assignee } = req.body;
 
   try {
     const task = await Task.create({
@@ -16,8 +16,10 @@ export const createTask = async (req: Request, res: Response) => {
       boardId,
       columnId,
       status: status || 'TODO',
-      assignee: (req as any).user._id
+      assignee: assignee || (req as any).user._id
     });
+
+    const populatedTask = await Task.findById(task._id).populate('assignee', 'name email');
 
     // Update Board columns taskIds
     const board = await Board.findById(boardId);
@@ -30,7 +32,7 @@ export const createTask = async (req: Request, res: Response) => {
       }
     }
 
-    res.status(201).json(task);
+    res.status(201).json(populatedTask);
   } catch (error) {
     res.status(400).json({ message: (error as Error).message });
   }
@@ -49,9 +51,11 @@ export const updateTask = async (req: Request, res: Response) => {
       task.dueDate = req.body.dueDate || task.dueDate;
       task.status = req.body.status || task.status;
       task.columnId = req.body.columnId || task.columnId;
+      task.assignee = req.body.assignee || task.assignee;
 
       const updatedTask = await task.save();
-      res.json(updatedTask);
+      const populatedTask = await Task.findById(updatedTask._id).populate('assignee', 'name email');
+      res.json(populatedTask);
     } else {
       res.status(404).json({ message: 'Task not found' });
     }

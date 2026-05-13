@@ -40,7 +40,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     navigate('/login');
   };
 
-  const handleCreateBoard = (data: { title: string; teamId: string }) => {
+  const handleCreateBoard = (data: { title: string; team: string }) => {
     dispatch(createBoard(data));
   };
 

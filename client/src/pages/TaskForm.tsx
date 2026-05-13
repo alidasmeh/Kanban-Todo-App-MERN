@@ -1,25 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Rocket, Calendar, AlertCircle, ChevronLeft, Save } from 'lucide-react';
+import { Rocket, Calendar, AlertCircle, ChevronLeft, Save, User as UserIcon } from 'lucide-react';
 import Layout from '../components/Layout';
 import type { AppDispatch, RootState } from '../store';
 import { createTask, updateTask } from '../features/boardSlice';
-import type { Task, Board } from '../types';
+import type { Task, Board, User } from '../types';
 
 const TaskForm: React.FC = () => {
   const { boardId, taskId } = useParams<{ boardId: string; taskId?: string }>();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { boards } = useSelector((state: RootState) => state.boards);
+  const { teams } = useSelector((state: RootState) => state.teams);
   
   const board = boards.find((b: Board) => b.id === boardId);
+  const team = teams.find(t => t.id === board?.team);
   const existingTask = board?.tasks.find((t: Task) => t.id === taskId);
+
+  // Combine owners and members for potential assignees
+  const members = team ? [...team.owners, ...team.members] : [];
+  // Remove duplicates just in case
+  const uniqueMembers = members.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
 
   const [title, setTitle] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [description, setDescription] = useState('');
   const [columnId, setColumnId] = useState('todo');
+  const [assigneeId, setAssigneeId] = useState('');
   const [errors, setErrors] = useState<{ title?: string; dueDate?: string }>({});
 
   useEffect(() => {
@@ -28,6 +36,7 @@ const TaskForm: React.FC = () => {
       setDueDate(existingTask.dueDate);
       setDescription(existingTask.description || '');
       setColumnId(existingTask.columnId);
+      setAssigneeId(existingTask.assignee?.id || '');
     }
   }, [existingTask]);
 
@@ -62,6 +71,7 @@ const TaskForm: React.FC = () => {
         dueDate,
         description,
         columnId,
+        assignee: assigneeId,
         boardId: boardId!
       }));
     } else {
@@ -70,7 +80,8 @@ const TaskForm: React.FC = () => {
         dueDate,
         description,
         boardId: boardId!,
-        columnId: 'todo' // Default to todo for new tasks via this page
+        columnId: 'todo',
+        assignee: assigneeId
       }));
     }
     
@@ -168,6 +179,29 @@ const TaskForm: React.FC = () => {
                   <span className="text-label-sm font-bold">{errors.dueDate}</span>
                 </div>
               )}
+            </div>
+
+            {/* Assignee Selection */}
+            <div className="space-y-2">
+              <label className="block text-label-md font-bold text-slate-700 uppercase tracking-wider" htmlFor="assignee">
+                Assignee
+              </label>
+              <div className="relative flex items-center">
+                <UserIcon className="absolute left-4 w-5 h-5 text-slate-400 pointer-events-none" />
+                <select
+                  id="assignee"
+                  className="w-full px-4 py-3 pl-12 rounded-lg border-2 border-slate-200 bg-slate-50 text-body-base outline-none focus:border-primary transition-all appearance-none"
+                  value={assigneeId}
+                  onChange={(e) => setAssigneeId(e.target.value)}
+                >
+                  <option value="">Select Assignee</option>
+                  {uniqueMembers.map((member) => (
+                    <option key={member.id} value={member.id}>
+                      {member.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 

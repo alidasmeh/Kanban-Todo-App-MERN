@@ -9,6 +9,7 @@ interface TaskPayload {
   title: string;
   dueDate: string;
   description?: string;
+  assignee?: string;
 }
 
 interface MoveTaskPayload {

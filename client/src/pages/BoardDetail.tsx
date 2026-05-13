@@ -13,7 +13,8 @@ import {
   MoreHorizontal, 
   Calendar, 
   Edit2,
-  Trash2
+  Trash2,
+  User as UserIcon
 } from 'lucide-react';
 import Layout from '../components/Layout';
 import type { AppDispatch, RootState } from '../store';
@@ -247,9 +248,19 @@ const BoardDetail: React.FC = () => {
                               )}
 
                               <div className="flex items-center justify-between mt-auto">
-                                <div className="flex items-center gap-2 text-slate-400">
-                                  <Calendar className="w-4 h-4" />
-                                  <span className="text-label-sm">{task.dueDate}</span>
+                                <div className="flex items-center gap-4 text-slate-400">
+                                  <div className="flex items-center gap-2">
+                                    <Calendar className="w-4 h-4" />
+                                    <span className="text-label-sm">{task.dueDate}</span>
+                                  </div>
+                                  {task.assignee && (
+                                    <div className="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">
+                                      <UserIcon className="w-3.5 h-3.5 text-primary" />
+                                      <span className="text-[10px] font-bold text-slate-600 truncate max-w-[80px]">
+                                        {task.assignee.name}
+                                      </span>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
 

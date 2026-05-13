@@ -12,10 +12,11 @@ import { createBoard } from '../features/boardSlice';
 
 const Boards: React.FC = () => {
   const { boards } = useSelector((state: RootState) => state.boards);
+  const { teams } = useSelector((state: RootState) => state.teams);
   const dispatch = useDispatch<AppDispatch>();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleCreateBoard = (data: { title: string; teamId: string }) => {
+  const handleCreateBoard = (data: { title: string; team: string }) => {
     dispatch(createBoard(data));
   };
 
@@ -35,6 +36,8 @@ const Boards: React.FC = () => {
           const taskCount = Object.values(board.columns).reduce((acc, col) => acc + col.taskIds.length, 0);
           const doneCount = board.columns['done']?.taskIds.length || 0;
           const progress = taskCount === 0 ? 0 : Math.round((doneCount / taskCount) * 100);
+          const teamName = teams.find(t => t.id === board.team)?.name || 'Unknown Team';
+          
           return (
             <Link 
               key={board.id} 
@@ -45,7 +48,7 @@ const Boards: React.FC = () => {
                 {board.title}
               </h3>
               <p className="text-body-sm text-slate-500 mb-6 line-clamp-2">
-                {board.description}
+                {teamName}
               </p>
               <div className="mt-auto">
                 <div className="flex items-center justify-between mb-4">

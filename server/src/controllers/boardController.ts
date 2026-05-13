@@ -26,12 +26,13 @@ export const getBoards = async (req: Request, res: Response) => {
     }).lean();
 
     const boardsWithTasks = await Promise.all(boards.map(async (board: any) => {
-      const tasks = await Task.find({ boardId: board._id }).lean();
+      const tasks = await Task.find({ boardId: board._id }).populate('assignee', 'name email').lean();
       
       // Transform tasks to match frontend structure (mapping _id to id)
       const transformedTasks = tasks.map((t: any) => ({
         ...t,
         id: t._id.toString(),
+        assignee: t.assignee ? { ...t.assignee, id: t.assignee._id.toString() } : undefined
       }));
 
       return {
@@ -51,10 +52,12 @@ export const getBoards = async (req: Request, res: Response) => {
 // @route   POST /api/boards
 // @access  Private
 export const createBoard = async (req: Request, res: Response) => {
-  const { title, description, category, color, teamId } = req.body;
+  const { title, description, category, color, teamId, team: teamProp } = req.body;
   const userId = (req as any).user._id;
 
-  if (!teamId) {
+  const actualTeamId = teamId || teamProp;
+
+  if (!actualTeamId) {
     return res.status(400).json({ message: 'Team ID is required' });
   }
 
@@ -65,7 +68,7 @@ export const createBoard = async (req: Request, res: Response) => {
       category,
       color,
       owner: userId,
-      team: teamId,
+      team: actualTeamId,
       members: [userId]
     });
 

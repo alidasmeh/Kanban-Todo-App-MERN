@@ -7,24 +7,24 @@ import type { RootState } from '../store';
 interface CreateBoardModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreate: (data: { title: string; teamId: string }) => void;
+  onCreate: (data: { title: string; team: string }) => void;
 }
 
 const CreateBoardModal: React.FC<CreateBoardModalProps> = ({ isOpen, onClose, onCreate }) => {
   const [title, setTitle] = useState('');
-  const [teamId, setTeamId] = useState('');
+  const [team, setTeam] = useState('');
   const { teams } = useSelector((state: RootState) => state.teams);
 
   useEffect(() => {
-    if (teams.length > 0 && !teamId) {
-      setTeamId(teams[0].id);
+    if (teams.length > 0 && !team) {
+      setTeam(teams[0].id);
     }
-  }, [teams, teamId]);
+  }, [teams, team]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (title.trim() && teamId) {
-      onCreate({ title, teamId });
+    if (title.trim() && team) {
+      onCreate({ title, team });
       setTitle('');
       onClose();
     }
@@ -57,8 +57,8 @@ const CreateBoardModal: React.FC<CreateBoardModalProps> = ({ isOpen, onClose, on
             <select
               className="w-full pl-12 pr-4 py-3 bg-slate-50 rounded-lg border border-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all text-body-base appearance-none cursor-pointer"
               id="board-team"
-              value={teamId}
-              onChange={(e) => setTeamId(e.target.value)}
+              value={team}
+              onChange={(e) => setTeam(e.target.value)}
               required
             >
               <option value="" disabled>Select a team</option>

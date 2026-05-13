@@ -21,6 +21,7 @@ For brevity and clarity, in some conversations, only [CODE] is written instead o
 15. [Cordinate the position of the toast in mobile version](#cordinate-the-position-of-the-toast-in-mobile-version)
 16. [Update the bearking point for responive versions](#update-the-bearking-point-for-responive-versions)
 17. [Update task creation form](#update-task-creation-form)
+18. [Assign task to a user](#assign-task-to-a-user)
 
 ## Index For Code Assistant [#](#gemini-code-assistant)
 1. [Delete edit button](#delete-edit-button)
@@ -9679,6 +9680,316 @@ Configured MCP servers:
    5. Cleanup: Removed the now-obsolete CreateTaskModal.tsx component.
 
   The application now provides a more robust and native-like experience for managing task details.
+
+## Assign task to a user
+
+> every task need to be assgined to only one user. in the task creation form add a new field to handle. it should be editable. the name of the assinee should be presented on the card of the task in main board.    
+                                                                                                                                                                                                                      
+
+  Researching Assignee Implementation: Researching the existing task and team models to implement the assignee feature.
+
+  ✓  ReadFile  server/src/models/Task.ts
+  ✓  ReadFile  server/src/models/Team.ts
+  ✓  ReadFile  client/src/features/teamSlice.ts
+  ✓  ReadFile  server/.../taskController.ts
+  ✓  ReadFile  server/.../boardController.ts
+  Updating Backend for Assignees: Updating backend controllers to handle and populate task assignees.
+
+  ✓  Edit  boardController.ts → Accepted (+2, -1)
+
+      26   }).lean();
+      27
+      28   const boardsWithTasks = await Promise.all(boards.map(async (board: any) => {
+      29 -   const tasks = await Task.find({ boardId: board._id }).lean();
+      29 +   const tasks = await Task.find({ boardId: board._id }).populate('assignee', 'name email').lean();
+      30     
+      31     // Transform tasks to match frontend structure (mapping _id to id)
+      32     const transformedTasks = tasks.map((t: any) => ({
+      33       ...t,
+      34       id: t._id.toString(),
+      35 +     assignee: t.assignee ? { ...t.assignee, id: t.assignee._id.toString() } : undefined
+      36     }));
+      37
+      38     return {
+
+  ✓  Edit  taskController.ts → Accepted (+4, -2)
+
+       6   // @route   POST /api/tasks
+       7   // @access  Private
+       8   export const createTask = async (req: Request, res: Response) => {
+       9 -   const { title, description, dueDate, boardId, columnId, status } = req.body;
+       9 +   const { title, description, dueDate, boardId, columnId, status, assignee } = req.body;
+      10
+      11     try {
+      12       const task = await Task.create({
+      16         boardId,
+      17         columnId,
+      18         status: status || 'TODO',
+      19 -       assignee: (req as any).user._id
+      19 +       assignee: assignee || (req as any).user._id
+      20       });
+      21
+      22 +     const populatedTask = await Task.findById(task._id).populate('assignee', 'name email');
+      23 + 
+      24       // Update Board columns taskIds
+      25       const board = await Board.findById(boardId);
+      26       if (board) {
+
+  ✓  Edit  taskController.ts → Accepted (+3, -1)
+
+      51     task.dueDate = req.body.dueDate || task.dueDate;
+      52     task.status = req.body.status || task.status;
+      53     task.columnId = req.body.columnId || task.columnId;
+      54 +   task.assignee = req.body.assignee || task.assignee;
+      55
+      56     const updatedTask = await task.save();
+      56 -   res.json(updatedTask);
+      57 +   const populatedTask = await Task.findById(updatedTask._id).populate('assignee', 'name email');
+      58 +   res.json(populatedTask);
+      59   } else {
+      60     res.status(404).json({ message: 'Task not found' });
+      61   }
+
+  ✓  Edit  taskController.ts → Accepted (+1, -1)
+
+      32       }
+      33     }
+      34
+      35 -   res.status(201).json(task);
+      35 +   res.status(201).json(populatedTask);
+      36   } catch (error) {
+      37     res.status(400).json({ message: (error as Error).message });
+      38   }
+
+  Updating Frontend State for Assignees: Updating frontend types and boardSlice to include assignee details.
+
+  ✓  Edit  index.ts → Accepted (+1, -1)
+
+      10     description?: string;
+      11     dueDate: string;
+      12     status: 'TODO' | 'IN_PROGRESS' | 'DONE';
+      13 -   assigneeId?: string;
+      13 +   assignee?: User;
+      14     boardId: string;
+      15     columnId: string;
+      16   }
+
+  ✓  Edit  boardSlice.ts → Accepted (+1, -0)
+
+       9     title: string;
+      10     dueDate: string;
+      11     description?: string;
+      12 +   assignee?: string;
+      13   }
+      14
+      15   interface MoveTaskPayload {
+
+  Adding Assignee to TaskForm: Implementing the assignee selection dropdown in the TaskForm.
+
+  ✓  Edit  TaskForm.tsx → Accepted (+14, -3)
+
+       1   import React, { useState, useEffect } from 'react';
+       2   import { useParams, useNavigate, Link } from 'react-router-dom';
+       3   import { useDispatch, useSelector } from 'react-redux';
+       4 - import { Rocket, Calendar, AlertCircle, ChevronLeft, Save } from 'lucide-react';
+       4 + import { Rocket, Calendar, AlertCircle, ChevronLeft, Save, User as UserIcon } from 'lucide-react';
+       5   import Layout from '../components/Layout';
+       6   import type { AppDispatch, RootState } from '../store';
+       7   import { createTask, updateTask } from '../features/boardSlice';
+       8 - import type { Task, Board } from '../types';
+       8 + import type { Task, Board, User } from '../types';
+       9
+      10   const TaskForm: React.FC = () => {
+      11     const { boardId, taskId } = useParams<{ boardId: string; taskId?: string }>();
+      12     const navigate = useNavigate();
+      13     const dispatch = useDispatch<AppDispatch>();
+      14     const { boards } = useSelector((state: RootState) => state.boards);
+      15 +   const { teams } = useSelector((state: RootState) => state.teams);
+      16
+      17     const board = boards.find((b: Board) => b.id === boardId);
+      18 +   const team = teams.find(t => t.id === board?.teamId);
+      19     const existingTask = board?.tasks.find((t: Task) => t.id === taskId);
+      20
+      21 +   // Combine owners and members for potential assignees
+      22 +   const members = team ? [...team.owners, ...team.members] : [];
+      23 +   // Remove duplicates just in case
+      24 +   const uniqueMembers = members.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
+      25 + 
+      26     const [title, setTitle] = useState('');
+      27     const [dueDate, setDueDate] = useState('');
+      28     const [description, setDescription] = useState('');
+      29     const [columnId, setColumnId] = useState('todo');
+      30 +   const [assigneeId, setAssigneeId] = useState('');
+      31     const [errors, setErrors] = useState<{ title?: string; dueDate?: string }>({});
+      32
+      33     useEffect(() => {
+      36         setDueDate(existingTask.dueDate);
+      37         setDescription(existingTask.description || '');
+      38         setColumnId(existingTask.columnId);
+      39 +       setAssigneeId(existingTask.assignee?.id || '');
+      40       }
+      41     }, [existingTask]);
+      42
+      ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+      71           dueDate,
+      72           description,
+      73           columnId,
+      74 +         assignee: assigneeId,
+      75           boardId: boardId!
+      76         }));
+      77       } else {
+      80           dueDate,
+      81           description,
+      82           boardId: boardId!,
+      73 -         columnId: 'todo' // Default to todo for new tasks via this page
+      ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+      83 +         columnId: 'todo',
+      84 +         assignee: assigneeId
+      85         }));
+      86       }
+      87
+  ✓  ReadFile  client/src/pages/TaskForm.tsx → Read lines 100-233 of 233 from client/src/pages/TaskForm.tsx
+  ✓  WriteFile  TaskForm.tsx → Accepted (+44, -0)
+
+      180         </div>
+      181       )}
+      182     </div>
+      183 + 
+      184 +   {/* Assignee Selection */}
+      185 +   <div className="space-y-2">
+      186 +     <label className="block text-label-md font-bold text-slate-700 uppercase tracking-wider" htmlFor="assignee">
+      187 +       Assignee
+      188 +     </label>
+      189 +     <div className="relative flex items-center">
+      190 +       <UserIcon className="absolute left-4 w-5 h-5 text-slate-400 pointer-events-none" />
+      191 +       <select
+      192 +         id="assignee"
+      193 +         className="w-full px-4 py-3 pl-12 rounded-lg border-2 border-slate-200 bg-slate-50 text-body-base outline-none focus:border-primary transition-all appearance-none"
+      194 +         value={assigneeId}
+      195 +         onChange={(e) => setAssigneeId(e.target.value)}
+      196 +       >
+      197 +         <option value="">Select Assignee</option>
+      198 +         {uniqueMembers.map((member) => (
+      199 +           <option key={member.id} value={member.id}>
+      200 +             {member.name}
+      201 +           </option>
+      202 +         ))}
+      203 +       </select>
+      204 +     </div>
+      205 +   </div>
+      206   </div>
+      207
+      208 + <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      209 +   {/* Column/Status Select (Only for Edit) */}
+      210 +   {existingTask && (
+      211 +     <div className="space-y-2">
+      212 +       <label className="block text-label-md font-bold text-slate-700 uppercase tracking-wider" htmlFor="column-id">
+      213 +         Status
+      214 +       </label>
+      215 +       <select
+      216 +         id="column-id"
+      217 +         className="w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-slate-50 text-body-base outline-none focus:border-primary transition-all appearance-none"
+      218 +         value={columnId}
+      219 +         onChange={(e) => setColumnId(e.target.value)}
+      220 +       >
+      221 +         <option value="todo">To Do</option>
+      222 +         <option value="in-progress">In Progress</option>
+      223 +         <option value="done">Done</option>
+      224 +       </select>
+      225 +     </div>
+      226 +   )}
+      227 + </div>
+      228 + 
+      229   {/* Description */}
+      230   <div className="space-y-2">
+      231     <label className="block text-label-md font-bold text-slate-700 uppercase tracking-wider" htmlFor="task-description">
+
+  Displaying Assignee on Task Cards: Displaying the assignee's name on task cards in BoardDetail.
+
+  ✓  Edit  BoardDetail.tsx → Accepted (+2, -1)
+
+      13     MoreHorizontal,
+      14     Calendar,
+      15     Edit2,
+      16 -   Trash2
+      16 +   Trash2,
+      17 +   User as UserIcon
+      18   } from 'lucide-react';
+      19   import Layout from '../components/Layout';
+      20   import type { AppDispatch, RootState } from '../store';
+
+  ✓  Edit  BoardDetail.tsx → Accepted (+13, -3)
+
+      248   )}
+      249
+      250   <div className="flex items-center justify-between mt-auto">
+      251 -   <div className="flex items-center gap-2 text-slate-400">
+      252 -     <Calendar className="w-4 h-4" />
+      253 -     <span className="text-label-sm">{task.dueDate}</span>
+      251 +   <div className="flex items-center gap-4 text-slate-400">
+      252 +     <div className="flex items-center gap-2">
+      253 +       <Calendar className="w-4 h-4" />
+      254 +       <span className="text-label-sm">{task.dueDate}</span>
+      255 +     </div>
+      256 +     {task.assignee && (
+      257 +       <div className="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">
+      258 +         <UserIcon className="w-3.5 h-3.5 text-primary" />
+      259 +         <span className="text-[10px] font-bold text-slate-600 truncate max-w-[80px]">
+      260 +           {task.assignee.name}
+      261 +         </span>
+      262 +       </div>
+      263 +     )}
+      264     </div>
+      265   </div>
+      266
+
+  Final Verification of AssignedTasks: Verifying and potentially updating the AssignedTasks page for consistency.
+
+  ✓  ReadFile  client/src/pages/AssignedTasks.tsx
+  Correcting AssignedTasks Filtering: Filtering AssignedTasks to only show tasks assigned to the current user.
+
+  ✓  Edit  AssignedTasks.tsx → Accepted (+4, -1)
+
+       8
+       9   const AssignedTasks: React.FC = () => {
+      10     const { boards } = useSelector((state: RootState) => state.boards);
+      11 +   const { user } = useSelector((state: RootState) => state.auth);
+      12     const navigate = useNavigate();
+      13     const [searchQuery, setSearchQuery] = useState('');
+      14
+      19       }, {} as Record<string, Board>);
+      20     }, [boards]);
+      21
+      21 -   const taskList = boards.flatMap(board => board.tasks);
+      22 +   const taskList = useMemo(() => {
+      23 +     return boards.flatMap(board => board.tasks.filter(task => task.assignee?.id === user?.id));
+      24 +   }, [boards, user]);
+      25
+      26     const filteredTasks = useMemo(() => {
+      27       if (!searchQuery.trim()) return taskList;
+
+
+✦ I have implemented the single-assignee feature across the application. Tasks can now be assigned to a specific team member, and this information is visible throughout the board.
+
+  Changes Made:
+
+  Backend (Server)
+   * Controllers: Updated taskController.ts and boardController.ts to support the assignee field. All task responses now automatically populate the assignee's name and email.
+   * Models: Verified the Task model correctly references the User model for the assignee field.
+
+  Frontend (Client)
+   * Types: Updated the Task interface in types/index.ts to include the populated assignee user object.
+   * Task Form Page: Added a new Assignee dropdown in the task creation and editing form.
+       * The dropdown is dynamically populated with members (owners and members) of the team associated with the board.
+       * You can easily change or set the assignee during task creation or any subsequent edit.
+   * Main Board (BoardDetail):
+       * Each task card now displays the assignee's name next to a user icon in the footer.
+       * Added visual styling (a small pill-like container) for the assignee's name to keep it distinct but compact.
+   * Assigned to Me Page:
+       * Updated the logic in AssignedTasks.tsx to correctly filter and show only the tasks assigned specifically to the logged-in user.
+
+  This implementation ensures that task ownership is clear and manageable within your Kanban workflow.
+
 
 ------ 
 ------ 

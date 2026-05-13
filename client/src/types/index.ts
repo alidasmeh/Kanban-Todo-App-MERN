@@ -10,7 +10,7 @@ export interface Task {
   description?: string;
   dueDate: string;
   status: 'TODO' | 'IN_PROGRESS' | 'DONE';
-  assigneeId?: string;
+  assignee?: User;
   boardId: string;
   columnId: string;
 }
@@ -27,7 +27,7 @@ export interface Board {
   description?: string;
   category?: string;
   color?: string;
-  teamId: string;
+  team: string;
   columns: { [key: string]: Column };
   columnOrder: string[];
   tasks: Task[];
