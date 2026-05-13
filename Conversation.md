@@ -23,6 +23,7 @@ For brevity and clarity, in some conversations, only [CODE] is written instead o
 17. [Update task creation form](#update-task-creation-form)
 18. [Assign task to a user](#assign-task-to-a-user)
 19. [Creating default board and team](#creating-default-board-and-team)
+20. [Update Readme](#update-readme)
 
 ## Index For Code Assistant [#](#gemini-code-assistant)
 1. [Delete edit button](#delete-edit-button)
@@ -10119,6 +10120,29 @@ Configured MCP servers:
    3. Unified Access: Since the "General" board is linked to the "Everyone" team, every new user will now see the "General" board on their dashboard immediately after logging in for the first time.
 
   This setup provides a "ready-to-use" experience for all new members of your platform.
+
+## Update Readme
+
+> update the readme file, it must include how to run the platform by docker-compose and also what stacks have been used. add descriptions when and with what information the DESIGN.md and GEMINI.md must be         
+   updated. also explain the design have been done in Stitch and trasffered to the app by MCP.                                                                                                                        
+                                                                                                                                                                                                                      
+
+  Updating Project Documentation: Updating README.md with comprehensive project documentation, including Docker setup, tech stack, and workflow guidelines.
+
+  ✓  ReadFile  README.md
+  ✓  WriteFile  README.md → Accepted (+56, -1)
+
+✦ I have updated the README.md file with comprehensive project documentation. It now includes:
+
+   1. Quick Start Guide: Detailed instructions on how to run the entire platform (Frontend, Backend, and Database) using docker-compose.
+   2. Detailed Tech Stack: Documentation of the MERN stack used (React, TypeScript, Redux Toolkit, Tailwind CSS, Node.js, Express, MongoDB).
+   3. Workflow Guidelines:
+       * Stitch & MCP: Explained how the UI was designed in Stitch and transferred using the Model Context Protocol.
+       * DESIGN.md: Clarified that this file should be updated when modifying the visual theme, component specs, or brand guidelines.
+       * GEMINI.md: Defined this as the foundational mandate for architecture and coding standards, to be updated when technical constraints or patterns change.
+   4. Feature Overview: Highlights key functionalities like default onboarding, responsive navigation, and the new dedicated task management flow.
+
+  The documentation now serves as a clear guide for both users setting up the project and developers maintaining it.
 
 ------ 
 ------ 
