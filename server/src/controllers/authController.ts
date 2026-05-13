@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import User from '../models/User';
+import Team from '../models/Team';
 import generateToken from '../utils/generateToken';
 
 // @desc    Auth user & get token
@@ -42,6 +43,13 @@ export const registerUser = async (req: Request, res: Response) => {
   });
 
   if (user) {
+    // Add user to "Everyone" team
+    const everyoneTeam = await Team.findOne({ name: 'Everyone' });
+    if (everyoneTeam) {
+      everyoneTeam.members.push(user._id as any);
+      await everyoneTeam.save();
+    }
+
     res.status(201).json({
       _id: user._id,
       name: user.name,

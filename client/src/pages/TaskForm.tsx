@@ -20,8 +20,10 @@ const TaskForm: React.FC = () => {
 
   // Combine owners and members for potential assignees
   const members = team ? [...team.owners, ...team.members] : [];
-  // Remove duplicates just in case
-  const uniqueMembers = members.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
+  // Remove duplicates and exclude System Admin
+  const uniqueMembers = members.filter((v, i, a) => 
+    a.findIndex(t => t.id === v.id) === i && v.email !== 'system@kinetic.com'
+  );
 
   const [title, setTitle] = useState('');
   const [dueDate, setDueDate] = useState('');

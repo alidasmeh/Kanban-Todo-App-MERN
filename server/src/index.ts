@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import morgan from 'morgan';
 import connectDB from './config/db';
+import { initDefaults } from './utils/initDefaults';
 import authRoutes from './routes/authRoutes';
 import boardRoutes from './routes/boardRoutes';
 import taskRoutes from './routes/taskRoutes';
@@ -11,7 +12,9 @@ import teamRoutes from './routes/teamRoutes';
 dotenv.config();
 
 // Connect to database
-connectDB();
+connectDB().then(() => {
+  initDefaults();
+});
 
 const app = express();
 
