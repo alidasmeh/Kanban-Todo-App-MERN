@@ -20,6 +20,7 @@ For brevity and clarity, in some conversations, only [CODE] is written instead o
 14. [Add quick status change buttons to task cards on mobile](#add-quick-status-change-buttons-to-task-cards-on-mobile)
 15. [Cordinate the position of the toast in mobile version](#cordinate-the-position-of-the-toast-in-mobile-version)
 16. [Update the bearking point for responive versions](#update-the-bearking-point-for-responive-versions)
+17. [Update task creation form](#update-task-creation-form)
 
 ## Index For Code Assistant [#](#gemini-code-assistant)
 1. [Delete edit button](#delete-edit-button)
@@ -9187,6 +9188,497 @@ Configured MCP servers:
    - Consistent Grid Scaling: Updated the board list grid to scale from 1 column (mobile) to 2 columns (tablet/large mobile) and finally 3 columns (desktop) only when the screen width exceeds 1280px.
 
   This ensures that the "mobile" experience—which is designed for single-column focus—is active on all devices that lack the width to support a full 3-column architectural view with the sidebar.
+
+
+## Update task creation form
+
+> currently to create a task there is a modal. I want instead of modal navigate user to a new page and the form of the task must be transffered inside the page. also, I want use the same page to edit the details  
+   of the task. if the route has and taskId at the end, the same page should be used to edit the task, otherwise it empty to create a task.                                                                           
+                                                                                                                                                                                                                      
+
+  Researching Task Logic: Researching existing task creation logic and planning the transition to a dedicated TaskForm page.
+
+  ✓  ReadFolder  client/src/components → Found 5 item(s).
+  ✓  ReadFolder  client/src/pages → Found 7 item(s).
+  ✓  ReadFile  client/src/App.tsx
+  ✓  ReadFile  client/.../CreateTaskModal.tsx
+  ✓  ReadFile  client/src/pages/BoardDetail.tsx
+  ✓  ReadFile  client/src/features/boardSlice.ts
+  ✓  ReadFile  client/.../CreateTaskModal.tsx
+  ✓  ReadFile  server/src/routes/taskRoutes.ts
+  ✓  ReadFile  server/.../taskController.ts
+  Implementing Task Updates: Adding updateTask action to boardSlice and preparing to implement TaskForm page.
+
+  ✓  Edit  boardSlice.ts → Accepted (+18, -0)
+
+       80     }
+       81   );
+       82
+       83 + export const updateTask = createAsyncThunk(
+       84 +   'boards/updateTask',
+       85 +   async (taskData: Partial<Task> & { id: string }, { dispatch, rejectWithValue }) => {
+       86 +     try {
+       87 +       const { id, ...updateData } = taskData;
+       88 +       const response = await api.put<Task & { _id: string }>(`/tasks/${id}`, updateData);
+       89 +       const updatedTask = { ...response.data, id: response.data._id } as Task;
+       90 +       dispatch(showNotification({ message: 'Task updated successfully!', type: 'success' }));
+       91 +       return updatedTask;
+       92 +     } catch (err) {
+       93 +       const axiosError = err as { response?: { data?: { message?: string } } };
+       94 +       const message = axiosError.response?.data?.message || 'Failed to update task';
+       95 +       dispatch(showNotification({ message, type: 'error' }));
+       96 +       return rejectWithValue(message);
+       97 +     }
+       98 +   }
+       99 + );
+      100 + 
+      101   export const deleteTask = createAsyncThunk(
+      102     'boards/deleteTask',
+      103     async ({ taskId, boardId, columnId }: DeleteTaskPayload, { dispatch, rejectWithValue }) => {
+
+  ✓  Edit  boardSlice.ts → Accepted (+17, -0)
+
+      185       }
+      186     }
+      187   })
+      188 + // Update Task
+      189 + .addCase(updateTask.fulfilled, (state, action) => {
+      190 +   const task = action.payload;
+      191 +   const board = state.boards.find(b => b.id === task.boardId);
+      192 +   if (board) {
+      193 +     const index = board.tasks.findIndex(t => t.id === task.id);
+      194 +     if (index !== -1) {
+      195 +       board.tasks[index] = task;
+      196 +     }
+      197 +   }
+      198 +   if (state.currentBoard?.id === task.boardId) {
+      199 +     const index = state.currentBoard.tasks.findIndex(t => t.id === task.id);
+      200 +     if (index !== -1) {
+      201 +       state.currentBoard.tasks[index] = task;
+      202 +     }
+      203 +   }
+      204 + })
+      205   // Delete Task
+      206   .addCase(deleteTask.fulfilled, (state, action) => {
+      207     const { taskId, boardId, columnId } = action.payload;
+
+  ✓  ReadFile  client/src/types/index.ts
+  Creating TaskForm Page: Creating the TaskForm page and updating App routes.
+
+  ✓  WriteFile  TaskForm.tsx → Accepted (+240, -0)
+
+      ... first 5 lines hidden (Ctrl+O to show) ...
+        6 import type { AppDispatch, RootState } from '../store';
+        7 import { createTask, updateTask } from '../features/boardSlice';
+        8 import type { Task, Board } from '../types';
+        9
+       10 const TaskForm: React.FC = () => {
+       11   const { boardId, taskId } = useParams<{ boardId: string; taskId?: string }>();
+       12   const navigate = useNavigate();
+       13   const dispatch = useDispatch<AppDispatch>();
+       14   const { boards } = useSelector((state: RootState) => state.boards);
+       15   
+       16   const board = boards.find((b: Board) => b.id === boardId);
+       17   const existingTask = board?.tasks.find((t: Task) => t.id === taskId);
+       18
+       19   const [title, setTitle] = useState('');
+       20   const [dueDate, setDueDate] = useState('');
+       21   const [description, setDescription] = useState('');
+       22   const [columnId, setColumnId] = useState('todo');
+       23   const [errors, setErrors] = useState<{ title?: string; dueDate?: string }>({});
+       24
+       25   useEffect(() => {
+       26     if (existingTask) {
+       27       setTitle(existingTask.title);
+       28       setDueDate(existingTask.dueDate);
+       29       setDescription(existingTask.description || '');
+       30       setColumnId(existingTask.columnId);
+       31     }
+       32   }, [existingTask]);
+       33
+       34   const handleSubmit = async (e: React.FormEvent) => {
+       35     e.preventDefault();
+       36     const newErrors: { title?: string; dueDate?: string } = {};
+       37
+       38     if (!title.trim()) {
+       39       newErrors.title = 'Title is required';
+       40     }
+       41
+       42     if (!dueDate) {
+       43       newErrors.dueDate = 'Due date is required';
+       44     } else {
+       45       const selectedDate = new Date(dueDate);
+       46       const today = new Date();
+       47       today.setHours(0, 0, 0, 0);
+       48       if (selectedDate < today && !existingTask) {
+       49         newErrors.dueDate = 'Due date cannot be in the past';
+       50       }
+       51     }
+       52
+       53     if (Object.keys(newErrors).length > 0) {
+       54       setErrors(newErrors);
+       55       return;
+       56     }
+       57
+       58     if (existingTask) {
+       59       await dispatch(updateTask({
+       60         id: existingTask.id,
+       61         title,
+       62         dueDate,
+       63         description,
+       64         columnId,
+       65         boardId: boardId!
+       66       }));
+       67     } else {
+       68       await dispatch(createTask({
+       69         title,
+       70         dueDate,
+       71         description,
+       72         boardId: boardId!,
+       73         columnId: 'todo' // Default to todo for new tasks via this page
+       74       }));
+       75     }
+       76     
+       77     navigate(`/boards/${boardId}`);
+       78   };
+       79
+       80   if (boardId && !board) {
+       81     return (
+       82       <Layout>
+       83         <div className="flex flex-col items-center justify-center h-full gap-4">
+       84           <h2 className="text-headline-md text-slate-800">Board not found</h2>
+       85           <Link to="/boards" className="text-primary font-bold hover:underline flex items-center gap-2">
+       86             <ChevronLeft className="w-5 h-5" />
+       87             Back to Boards
+       88           </Link>
+       89         </div>
+       90       </Layout>
+       91     );
+       92   }
+       93
+       94   return (
+       95     <Layout>
+       96       <div className="max-w-3xl mx-auto">
+       97         <header className="mb-8">
+       98           <Link 
+       99             to={`/boards/${boardId}`} 
+      100             className="inline-flex items-center gap-2 text-label-md text-slate-500 hover:text-primary transition-colors mb-4"
+      101           >
+      102             <ChevronLeft className="w-4 h-4" />
+      103             Back to Board
+      104           </Link>
+      105           <h1 className="text-headline-lg text-slate-800">
+      106             {existingTask ? 'Edit Task' : 'Create New Task'}
+      107           </h1>
+      108           <p className="text-slate-500 text-body-base mt-2">
+      109             {existingTask 
+      110               ? 'Update your task details to keep your project on track.' 
+      111               : 'Set up your next milestone with clarity and precision.'}
+      112           </p>
+      113         </header>
+      114
+      115         <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-soft-float border border-slate-100 p-6 xl:p-8 space-y-8">
+      116           {/* Title Field */}
+      117           <div className="space-y-2">
+      118             <label className="block text-label-md font-bold text-slate-700 uppercase tracking-wider" htmlFor="task-title">
+      119               Title <span className="text-error">*</span>
+      120             </label>
+      121             <div className="relative">
+      122               <input
+      123                 className={`w-full px-4 py-3 rounded-lg border-2 bg-slate-50 text-body-base placeholder:text-slate-400 outline-none transition-all ${
+      124                   errors.title ? 'border-error focus:border-error' : 'border-slate-200 focus:border-primary'
+      125                 }`}
+      126                 id="task-title"
+      127                 placeholder="e.g., Finalize Q4 Engineering Roadmap"
+      128                 value={title}
+      129                 onChange={(e) => {
+      130                   setTitle(e.target.value);
+      131                   if (e.target.value) setErrors((prev) => ({ ...prev, title: undefined }));
+      132                 }}
+      133                 autoFocus
+      134               />
+      135               {errors.title && (
+      136                 <div className="mt-2 flex items-center gap-1.5 text-error">
+      137                   <AlertCircle className="w-4 h-4 fill-current" />
+      138                   <span className="text-label-sm font-bold">{errors.title}</span>
+      139                 </div>
+      140               )}
+      141             </div>
+      142           </div>
+      143
+      144           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      145             {/* Due Date */}
+      146             <div className="space-y-2">
+      147               <label className="block text-label-md font-bold text-slate-700 uppercase tracking-wider" htmlFor="due-date">
+      148                 Due Date <span className="text-error">*</span>
+      149               </label>
+      150               <div className="relative flex items-center">
+      151                 <Calendar className="absolute left-4 w-5 h-5 text-slate-400 pointer-events-none" />
+      152                 <input
+      153                   className={`w-full px-4 py-3 pl-12 rounded-lg border-2 bg-slate-50 text-body-base outline-none transition-all ${
+      154                     errors.dueDate ? 'border-error focus:border-error' : 'border-slate-200 focus:border-primary'
+      155                   }`}
+      156                   id="due-date"
+      157                   type="date"
+      158                   value={dueDate}
+      159                   onChange={(e) => {
+      160                     setDueDate(e.target.value);
+      161                     if (e.target.value) setErrors((prev) => ({ ...prev, dueDate: undefined }));
+      162                   }}
+      163                 />
+      164               </div>
+      165               {errors.dueDate && (
+      166                 <div className="mt-2 flex items-center gap-1.5 text-error">
+      167                   <AlertCircle className="w-4 h-4 fill-current" />
+      168                   <span className="text-label-sm font-bold">{errors.dueDate}</span>
+      169                 </div>
+      170               )}
+      171             </div>
+      172
+      173             {/* Column/Status Select (Only for Edit) */}
+      174             {existingTask && (
+      175               <div className="space-y-2">
+      176                 <label className="block text-label-md font-bold text-slate-700 uppercase tracking-wider" htmlFor="column-id">
+      177                   Status
+      178                 </label>
+      179                 <select
+      180                   id="column-id"
+      181                   className="w-full px-4 py-3 rounded-lg border-2 border-slate-200 bg-slate-50 text-body-base outline-none focus:border-primary transition-all appearance-none"
+      182                   value={columnId}
+      183                   onChange={(e) => setColumnId(e.target.value)}
+      184                 >
+      185                   <option value="todo">To Do</option>
+      186                   <option value="in-progress">In Progress</option>
+      187                   <option value="done">Done</option>
+      188                 </select>
+      189               </div>
+      190             )}
+      191           </div>
+      192
+      193           {/* Description */}
+      194           <div className="space-y-2">
+      195             <label className="block text-label-md font-bold text-slate-700 uppercase tracking-wider" htmlFor="task-description">
+      196               Description
+      197             </label>
+      198             <textarea
+      199               className="w-full px-4 py-3 rounded-lg border-2 border-slate-200 focus:border-primary bg-slate-50 text-body-base resize-none outline-none transition-all"
+      200               id="task-description"
+      201               placeholder="Detail the objectives, stakeholders, and success criteria..."
+      202               rows={6}
+      203               value={description}
+      204               onChange={(e) => setDescription(e.target.value)}
+      205             ></textarea>
+      206           </div>
+      207
+      208           {/* Form Actions */}
+      209           <div className="pt-8 border-t border-slate-100 flex justify-end gap-4">
+      210             <button
+      211               className="px-6 py-3 rounded-xl text-label-md font-bold text-slate-500 hover:bg-slate-100 transition-all active:scale-95"
+      212               type="button"
+      213               onClick={() => navigate(`/boards/${boardId}`)}
+      214             >
+      215               Cancel
+      216             </button>
+      217             <button
+      218               className="px-10 py-3 rounded-xl text-label-md font-bold bg-primary text-white shadow-md hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+      219               type="submit"
+      220             >
+      221               {existingTask ? (
+      222                 <>
+      223                   <Save className="w-5 h-5" />
+      224                   Update Task
+      225                 </>
+      226               ) : (
+      227                 <>
+      228                   <Rocket className="w-5 h-5" />
+      229                   Create Task
+      230                 </>
+      231               )}
+      232             </button>
+      233           </div>
+      234         </form>
+      235       </div>
+      236     </Layout>
+      237   );
+      238 };
+      239
+  ✓  Edit  App.tsx → Accepted (+3, -0)
+
+       8   import Signup from './pages/Signup';
+       9   import Boards from './pages/Boards';
+      10   import BoardDetail from './pages/BoardDetail';
+      11 + import TaskForm from './pages/TaskForm';
+      12   import AssignedTasks from './pages/AssignedTasks';
+      13   import Teams from './pages/Teams';
+      14   import TeamDetail from './pages/TeamDetail';
+      ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+      32           {/* Protected Routes */}
+      33           <Route path="/boards" element={isAuthenticated ? <Boards /> : <Navigate to="/login" />} />
+      34           <Route path="/boards/:id" element={isAuthenticated ? <BoardDetail /> : <Navigate to="/login" />} />
+      35 +         <Route path="/boards/:boardId/tasks/new" element={isAuthenticated ? <TaskForm /> : <Navigate to="/login" />} />
+      36 +         <Route path="/boards/:boardId/tasks/:taskId" element={isAuthenticated ? <TaskForm /> : <Navigate to="/login" />} />
+      37           <Route path="/assigned" element={isAuthenticated ? <AssignedTasks /> : <Navigate to="/login" />} />
+      38           <Route path="/teams" element={isAuthenticated ? <Teams /> : <Navigate to="/login" />} />
+      39           <Route path="/teams/:id" element={isAuthenticated ? <TeamDetail /> : <Navigate to="/login" />} />
+
+  Refactoring BoardDetail: Refactoring BoardDetail to use the new TaskForm page and removing the modal.
+
+  ✓  Edit  BoardDetail.tsx → Accepted (+2, -10)
+
+       1   import React, { useState, useRef, useEffect } from 'react';
+       2 - import { useParams, Link } from 'react-router-dom';
+       2 + import { useParams, Link, useNavigate } from 'react-router-dom';
+       3   import { useDispatch, useSelector } from 'react-redux';
+       4   import { 
+       5     DragDropContext,
+      ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+      16     Trash2
+      17   } from 'lucide-react';
+      18   import Layout from '../components/Layout';
+      19 - import CreateTaskModal from '../components/CreateTaskModal';
+      19   import type { AppDispatch, RootState } from '../store';
+      20   import type { Board } from '../types';
+      21   import { 
+      23 -   createTask as createTaskAction, 
+      22     deleteTask as deleteTaskAction, 
+      23     moveTask as moveTaskAction 
+      24   } from '../features/boardSlice';
+      25
+      26   const BoardDetail: React.FC = () => {
+      27     const { id } = useParams<{ id: string }>();
+      28 +   const navigate = useNavigate();
+      29     const dispatch = useDispatch<AppDispatch>();
+      30     const { boards } = useSelector((state: RootState) => state.boards);
+      31     const board = boards.find((b: Board) => b.id === id);
+      33 -   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+      34 -   const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
+      32     const [openMenuTaskId, setOpenMenuTaskId] = useState<string | null>(null);
+      33     const [mobileActiveColumn, setMobileActiveColumn] = useState<string>('');
+      34     const menuRef = useRef<HTMLDivElement | null>(null);
+      ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+      55       };
+      56     }, [openMenuTaskId]);
+      57
+      61 -   const handleCreateTask = (taskData: { title: string; dueDate: string; description: string }) => {
+      62 -     const columnId = activeColumnId || 'todo';
+      63 -     dispatch(createTaskAction({ boardId: id || '1', columnId, ...taskData }));
+      64 -   };
+      65 - 
+      58     const handleDeleteTask = (taskId: string, columnId: string) => {
+      59       dispatch(deleteTaskAction({ taskId, boardId: id || '1', columnId }));
+      60       setOpenMenuTaskId(null);
+
+  ✓  ReadFile  client/src/pages/BoardDetail.tsx
+  ✓  WriteFile  BoardDetail.tsx → Accepted (+19, -16)
+
+      105       <h1 className="text-headline-md xl:text-headline-lg text-slate-800">{board.title}</h1>
+      106     </div>
+      107     <div className="hidden xl:flex items-center gap-3">
+      108 -     <button 
+      109 -       onClick={() => {
+      110 -         setActiveColumnId('todo');
+      111 -         setIsTaskModalOpen(true);
+      112 -       }}
+      108 +     <Link 
+      109 +       to={`/boards/${id}/tasks/new`}
+      110         className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-label-md hover:opacity-90 active:scale-95 transition-all w-full xl:w-auto justify-center"
+      111       >
+      112         <Plus className="w-4.5 h-4.5" />
+      113         New Task
+      117 -     </button>
+      114 +     </Link>
+      115     </div>
+      116   </header>
+      117
+      ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+      171                           ref={provided.innerRef}
+      172                           {...provided.draggableProps}
+      173                           {...provided.dragHandleProps}
+      174 +                         onClick={() => navigate(`/boards/${id}/tasks/${task.id}`)}
+      175                           style={{
+      176                             ...provided.draggableProps.style,
+      177                             transform: snapshot.isDragging 
+      ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+      198                               <button 
+      199                                 onClick={(e) => {
+      200                                   e.preventDefault();
+      201 +                                 e.stopPropagation();
+      202                                   setOpenMenuTaskId(openMenuTaskId === task.id ? null : task.id);
+      203                                 }}
+      204                                 className="p-1 rounded-md hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
+      ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+      212                                   className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-xl border border-slate-100 z-[100] py-1"
+      213                                 >
+      214                                   <div className="border-t border-slate-50 my-1"></div>
+      216 -                                 <button className="w-full text-left px-3 py-2 text-body-sm text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2">
+      215 +                                 <button 
+      216 +                                   onClick={(e) => {
+      217 +                                     e.preventDefault();
+      218 +                                     e.stopPropagation();
+      219 +                                     navigate(`/boards/${id}/tasks/${task.id}`);
+      220 +                                   }}
+      221 +                                   className="w-full text-left px-3 py-2 text-body-sm text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2"
+      222 +                                 >
+      223                                     <Edit2 className="w-3.5 h-3.5" />
+      224                                     Edit Task
+      225                                   </button>
+      226                                   <button 
+      221 -                                   onClick={() => handleDeleteTask(task.id, task.columnId)}
+      227 +                                   onClick={(e) => {
+      228 +                                     e.preventDefault();
+      229 +                                     e.stopPropagation();
+      230 +                                     handleDeleteTask(task.id, task.columnId);
+      231 +                                   }}
+      232                                     className="w-full text-left px-3 py-2 text-body-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+      233                                   >
+      234                                     <Trash2 className="w-3.5 h-3.5" />
+      ════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
+      300     </div>
+      301   </DragDropContext>
+      302
+      293 - <CreateTaskModal 
+      294 -   isOpen={isTaskModalOpen} 
+      295 -   onClose={() => setIsTaskModalOpen(false)} 
+      296 -   onCreate={handleCreateTask} 
+      297 - />
+      298 - 
+      303   {/* Mobile Floating Action Button */}
+      304   <button 
+      305     onClick={() => {
+      302 -     setActiveColumnId(mobileActiveColumn || 'todo');
+      303 -     setIsTaskModalOpen(true);
+      306 +     navigate(`/boards/${id}/tasks/new`);
+      307     }}
+      308     className="xl:hidden fixed bottom-20 right-6 w-14 h-14 bg-primary text-white rounded-2xl shadow-lg flex items-center justify-center z-50 active:scale-90 transition-transform"
+      309   >
+
+  ✓  SearchText  'CreateTaskModal' → Found 20 matches
+  ✓  ReadFile  client/src/pages/BoardDetail.tsx
+╭────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ ✓  Shell rm client/src/components/CreateTaskModal.tsx                                                                                                                                                          │
+│                                                                                                                                                                                                                │
+│                                                                                                                                                                                                                │
+╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+  ✓  SearchText  'Modal' → Found 100 matches (limited)
+  Task Management Refactored: Completed the transition from modal-based task management to a dedicated TaskForm page.
+
+
+✦ I have successfully refactored the task management system to use a dedicated page instead of a modal for creating and editing tasks.
+
+  Key Changes:
+   1. New TaskForm Page: Created client/src/pages/TaskForm.tsx which handles both task creation and editing. It features a clean, responsive layout consistent with your design system.
+   2. Routing Updates: Added new routes in App.tsx:
+       * /boards/:boardId/tasks/new: For creating a new task.
+       * /boards/:boardId/tasks/:taskId: For editing an existing task.
+   3. Refactored BoardDetail:
+       * Removed the CreateTaskModal dependency.
+       * Updated the "New Task" buttons to navigate to the new form page.
+       * Made task cards clickable, navigating users to the edit page.
+       * Updated the "Edit Task" option in the task context menu to use navigation.
+   4. Redux Enhancements: Added an updateTask async thunk to boardSlice.ts to support updating task details through the new form.
+   5. Cleanup: Removed the now-obsolete CreateTaskModal.tsx component.
+
+  The application now provides a more robust and native-like experience for managing task details.
 
 ------ 
 ------ 

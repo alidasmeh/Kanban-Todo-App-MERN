@@ -80,6 +80,24 @@ export const createTask = createAsyncThunk(
   }
 );
 
+export const updateTask = createAsyncThunk(
+  'boards/updateTask',
+  async (taskData: Partial<Task> & { id: string }, { dispatch, rejectWithValue }) => {
+    try {
+      const { id, ...updateData } = taskData;
+      const response = await api.put<Task & { _id: string }>(`/tasks/${id}`, updateData);
+      const updatedTask = { ...response.data, id: response.data._id } as Task;
+      dispatch(showNotification({ message: 'Task updated successfully!', type: 'success' }));
+      return updatedTask;
+    } catch (err) {
+      const axiosError = err as { response?: { data?: { message?: string } } };
+      const message = axiosError.response?.data?.message || 'Failed to update task';
+      dispatch(showNotification({ message, type: 'error' }));
+      return rejectWithValue(message);
+    }
+  }
+);
+
 export const deleteTask = createAsyncThunk(
   'boards/deleteTask',
   async ({ taskId, boardId, columnId }: DeleteTaskPayload, { dispatch, rejectWithValue }) => {
@@ -164,6 +182,23 @@ const boardSlice = createSlice({
           state.currentBoard.tasks.push(task);
           if (state.currentBoard.columns[task.columnId]) {
             state.currentBoard.columns[task.columnId].taskIds.push(task.id);
+          }
+        }
+      })
+      // Update Task
+      .addCase(updateTask.fulfilled, (state, action) => {
+        const task = action.payload;
+        const board = state.boards.find(b => b.id === task.boardId);
+        if (board) {
+          const index = board.tasks.findIndex(t => t.id === task.id);
+          if (index !== -1) {
+            board.tasks[index] = task;
+          }
+        }
+        if (state.currentBoard?.id === task.boardId) {
+          const index = state.currentBoard.tasks.findIndex(t => t.id === task.id);
+          if (index !== -1) {
+            state.currentBoard.tasks[index] = task;
           }
         }
       })

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { 
   DragDropContext, 
@@ -16,22 +16,19 @@ import {
   Trash2
 } from 'lucide-react';
 import Layout from '../components/Layout';
-import CreateTaskModal from '../components/CreateTaskModal';
 import type { AppDispatch, RootState } from '../store';
 import type { Board } from '../types';
 import { 
-  createTask as createTaskAction, 
   deleteTask as deleteTaskAction, 
   moveTask as moveTaskAction 
 } from '../features/boardSlice';
 
 const BoardDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { boards } = useSelector((state: RootState) => state.boards);
   const board = boards.find((b: Board) => b.id === id);
-  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [activeColumnId, setActiveColumnId] = useState<string | null>(null);
   const [openMenuTaskId, setOpenMenuTaskId] = useState<string | null>(null);
   const [mobileActiveColumn, setMobileActiveColumn] = useState<string>('');
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -57,11 +54,6 @@ const BoardDetail: React.FC = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [openMenuTaskId]);
-
-  const handleCreateTask = (taskData: { title: string; dueDate: string; description: string }) => {
-    const columnId = activeColumnId || 'todo';
-    dispatch(createTaskAction({ boardId: id || '1', columnId, ...taskData }));
-  };
 
   const handleDeleteTask = (taskId: string, columnId: string) => {
     dispatch(deleteTaskAction({ taskId, boardId: id || '1', columnId }));
@@ -113,16 +105,13 @@ const BoardDetail: React.FC = () => {
           <h1 className="text-headline-md xl:text-headline-lg text-slate-800">{board.title}</h1>
         </div>
         <div className="hidden xl:flex items-center gap-3">
-          <button 
-            onClick={() => {
-              setActiveColumnId('todo');
-              setIsTaskModalOpen(true);
-            }}
+          <Link 
+            to={`/boards/${id}/tasks/new`}
             className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-label-md hover:opacity-90 active:scale-95 transition-all w-full xl:w-auto justify-center"
           >
             <Plus className="w-4.5 h-4.5" />
             New Task
-          </button>
+          </Link>
         </div>
       </header>
 
@@ -208,6 +197,7 @@ const BoardDetail: React.FC = () => {
                                   <button 
                                     onClick={(e) => {
                                       e.preventDefault();
+                                      e.stopPropagation();
                                       setOpenMenuTaskId(openMenuTaskId === task.id ? null : task.id);
                                     }}
                                     className="p-1 rounded-md hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
@@ -221,12 +211,23 @@ const BoardDetail: React.FC = () => {
                                       className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-xl border border-slate-100 z-[100] py-1"
                                     >
                                       <div className="border-t border-slate-50 my-1"></div>
-                                      <button className="w-full text-left px-3 py-2 text-body-sm text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2">
+                                      <button 
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          navigate(`/boards/${id}/tasks/${task.id}`);
+                                        }}
+                                        className="w-full text-left px-3 py-2 text-body-sm text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-2"
+                                      >
                                         <Edit2 className="w-3.5 h-3.5" />
                                         Edit Task
                                       </button>
                                       <button 
-                                        onClick={() => handleDeleteTask(task.id, task.columnId)}
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          handleDeleteTask(task.id, task.columnId);
+                                        }}
                                         className="w-full text-left px-3 py-2 text-body-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
                                       >
                                         <Trash2 className="w-3.5 h-3.5" />
@@ -298,17 +299,10 @@ const BoardDetail: React.FC = () => {
         </div>
       </DragDropContext>
 
-      <CreateTaskModal 
-        isOpen={isTaskModalOpen} 
-        onClose={() => setIsTaskModalOpen(false)} 
-        onCreate={handleCreateTask} 
-      />
-
       {/* Mobile Floating Action Button */}
       <button 
         onClick={() => {
-          setActiveColumnId(mobileActiveColumn || 'todo');
-          setIsTaskModalOpen(true);
+          navigate(`/boards/${id}/tasks/new`);
         }}
         className="xl:hidden fixed bottom-20 right-6 w-14 h-14 bg-primary text-white rounded-2xl shadow-lg flex items-center justify-center z-50 active:scale-90 transition-transform"
       >
