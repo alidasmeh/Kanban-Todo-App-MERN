@@ -68,10 +68,10 @@ const Boards: React.FC = () => {
           );
         })}
 
-        {/* Mobile-only Create Board Button */}
+        {/* Create Board Button */}
         <button
           onClick={() => setIsModalOpen(true)}
-          className="xl:hidden flex flex-col items-center justify-center gap-4 bg-white rounded-xl shadow-soft-float border-2 border-dashed border-slate-200 p-8 hover:border-primary hover:bg-slate-50 transition-all text-slate-500 hover:text-primary min-h-[200px]"
+          className="flex flex-col items-center justify-center gap-4 bg-white rounded-xl shadow-soft-float border-2 border-dashed border-slate-200 p-6 hover:border-primary hover:bg-slate-50 transition-all text-slate-500 hover:text-primary min-h-[200px] group h-full"
         >
           <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center group-hover:bg-indigo-50 transition-colors">
             <Plus className="w-6 h-6" />

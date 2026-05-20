@@ -1,18 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { 
   LayoutDashboard, 
   UserCheck, 
   Users,
-  Plus, 
   LogOut,
   User
 } from 'lucide-react';
 import { logout } from '../features/authSlice';
-import { createBoard, fetchBoards } from '../features/boardSlice';
+import { fetchBoards } from '../features/boardSlice';
 import { fetchTeams } from '../features/teamSlice';
-import CreateBoardModal from './CreateBoardModal';
 import type { RootState, AppDispatch } from '../store';
 
 interface LayoutProps {
@@ -20,7 +18,6 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
@@ -36,10 +33,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const handleLogout = () => {
     dispatch(logout());
     navigate('/login');
-  };
-
-  const handleCreateBoard = (data: { title: string; team: string }) => {
-    dispatch(createBoard(data));
   };
 
   const navItems = [
@@ -83,14 +76,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               );
             })}
           </nav>
-
-          <button 
-            onClick={() => setIsModalOpen(true)}
-            className="mt-6 flex items-center justify-center gap-2 w-full py-2.5 bg-primary text-on-primary rounded-lg text-label-md shadow-sm hover:opacity-90 transition-all active:scale-95 text-white"
-          >
-            <Plus className="w-4 h-4" />
-            Create New Board
-          </button>
 
           <div className="mt-auto space-y-1 border-t border-outline-variant pt-4">
             {user && (
@@ -138,11 +123,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </Link>
       </nav>
 
-      <CreateBoardModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        onCreate={handleCreateBoard} 
-      />
     </div>
   );
 };
